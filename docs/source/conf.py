@@ -22,7 +22,7 @@ import re
 from kedro.framework.cli.utils import find_stylesheets
 from recommonmark.transform import AutoStructify
 
-from new_kedro_project import __version__ as release
+from football_madness import __version__ as release
 
 # -- Project information -----------------------------------------------------
 

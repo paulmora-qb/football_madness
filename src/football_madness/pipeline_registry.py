@@ -1,7 +1,9 @@
 """Project pipelines."""
 from typing import Dict
 
-from kedro.pipeline import Pipeline, pipeline
+from kedro.pipeline import Pipeline
+
+from data_creation import create_data_creation_pipeline
 
 
 def register_pipelines() -> Dict[str, Pipeline]:
@@ -10,4 +12,4 @@ def register_pipelines() -> Dict[str, Pipeline]:
     Returns:
         A mapping from a pipeline name to a ``Pipeline`` object.
     """
-    return {"__default__": pipeline([])}
+    return {"data_creation": create_data_creation_pipeline()}
