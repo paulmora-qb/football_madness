@@ -6,7 +6,7 @@
         }
     },
     "editor.formatOnSave": true,
-    "editor.fontSize": 20,
+    "editor.fontSize": 16,
     "editor.renderWhitespace": "all",
     "python.envFile": "${workspaceFolder}/.vscode/.env",
     "editor.rulers": [

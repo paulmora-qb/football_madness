@@ -1,7 +1,5 @@
 
 
 raw_data_creation:
-  api_start: https://datahub.io/sports-data
-  api_end: datapackage.json
-  leagues_list:
-    - english-premier-league
+  desired_leagues:
+    - premier_league

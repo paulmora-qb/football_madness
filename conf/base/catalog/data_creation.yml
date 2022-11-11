@@ -8,6 +8,12 @@ _csv: &csv
   save_args:
     index: False
 
-raw_data:
-  <<: *csv
-  filepath: "./data/01_raw/test.csv"
+all_euro_data_2001_2023:
+  type: PartitionedDataSet
+  dataset:
+    type: football_madness.extras.datasets.excel_dataset.AdjustedExcelDataSet
+    load_args:
+      sheet_name: null
+      engine: null
+  path: ./data/01_raw
+  filename_suffix: .xls
