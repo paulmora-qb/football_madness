@@ -23,8 +23,6 @@ concatenated_raw_data:
   file_format: parquet
   load_args:
     header: True
-    schema:
-      filepath: ./data/01_raw/filtered_schema.json
   save_args:
     header: True
     partitionBy: league

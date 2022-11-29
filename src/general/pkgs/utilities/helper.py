@@ -5,6 +5,19 @@ from typing import Iterable, List
 from pyspark.sql import SparkSession
 
 
+def _find_list_elements_using_keyword(
+    lst: List, including_keyword: str = None, excluding_keyword: str = None
+) -> List:
+
+    if including_keyword:
+        lst = [x for x in lst if including_keyword in x]
+
+    if excluding_keyword:
+        lst = [x for x in lst if excluding_keyword not in x]
+
+    return lst
+
+
 def _get_spark_session() -> SparkSession:
     return SparkSession.builder.getOrCreate()
 

@@ -1,0 +1,11 @@
+
+_pq: &pq
+  type: spark.SparkDataSet
+  file_format: parquet
+  save_args:
+    mode: overwrite
+    partitionBy: league
+
+team_spine:
+  <<: *pq
+  filepath: ./data/04_feature/team_spine
