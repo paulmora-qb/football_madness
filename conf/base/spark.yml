@@ -1,0 +1,4 @@
+spark.appName: Test
+spark.executor.memory: 12g
+spark.executor.cores: 2
+spark.driver.memory: 3g

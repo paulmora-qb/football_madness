@@ -1,9 +1,9 @@
 """Data Creation Pipeline"""
 
 
-from kedro.pipeline import Pipeline, node
+from kedro.pipeline import Pipeline
 
-from .nodes import prm_raw_data
+from .nodes import concatenate_raw_data_node, filter_rename_raw_data_node
 
 
 def create_data_creation_pipeline() -> Pipeline:
@@ -12,4 +12,9 @@ def create_data_creation_pipeline() -> Pipeline:
     Returns:
         Pipeline
     """
-    return Pipeline(prm_raw_data)
+
+    nodes = [
+        concatenate_raw_data_node,
+        filter_rename_raw_data_node,
+    ]
+    return Pipeline(nodes)

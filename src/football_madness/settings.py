@@ -1,6 +1,8 @@
 """Project settings."""
 from football_madness.hooks import ProjectHooks
 
+from .context import SparkContext
+
 # Instantiate and list your project hooks here
 HOOKS = (ProjectHooks(),)
 
@@ -17,7 +19,7 @@ HOOKS = (ProjectHooks(),)
 # }
 
 # Define custom context class. Defaults to `KedroContext`
-# CONTEXT_CLASS = KedroContext
+CONTEXT_CLASS = SparkContext
 
 # Define the configuration folder. Defaults to `conf`
-# CONF_ROOT = "conf"
+CONF_ROOT = "conf"
