@@ -12,4 +12,7 @@ def register_pipelines() -> Dict[str, Pipeline]:
     Returns:
         A mapping from a pipeline name to a ``Pipeline`` object.
     """
-    return {"data_creation": create_data_creation_pipeline()}
+    return {
+        "data_creation": create_data_creation_pipeline(),
+        "feature_engineering": create_feature_engineering_pipeline(),
+    }

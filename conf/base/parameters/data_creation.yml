@@ -56,8 +56,6 @@ data_preparation:
     WHH: williamhill_home_odds
     WHD: williamhill_draw_odds
     WHA: williamhill_away_oods
-    HT: TBC_HT 
-    AT: TBC_AT
     SYH: stanleybet_home_odds
     SYD: stanleybet_draw_odds
     SYA: stanleybet_away_odds
@@ -79,6 +77,8 @@ data_preparation:
     PSCH: pinnacle_home_odds
     PSCD: pinnacle_draw_odds
     PSCA: pinnacle_away_odds
+    # HT: TBC_HT 
+    # AT: TBC_AT
     # GBAHH
     # GBAHA,
     # GBAH,

@@ -45,7 +45,7 @@
                 "--pipeline",
                 "data_creation",
                 "--node",
-                "filter_rename_raw_data",
+                "create_raw_data",
             ]
         },
     ]
