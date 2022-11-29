@@ -1,12 +1,6 @@
 
 
 data_preparation:
-  filter_params:
-    leagues:
-      - E1
-    dates:
-      season_year_start: 2000
-      season_year_end: 2023
   renaming_columns:
     Div: league
     Date: date

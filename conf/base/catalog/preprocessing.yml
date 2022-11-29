@@ -15,7 +15,7 @@ all_euro_data_2000_2023:
 
 filtered_schema:
   type: json.JSONDataSet
-  filepath: data/01_raw/filtered_dataset_schema.json
+  filepath: data/01_raw/filtered_schema.json
 
 concatenated_raw_data:
   type: spark.SparkDataSet
@@ -28,4 +28,5 @@ concatenated_raw_data:
   save_args:
     header: True
     partitionBy: league
+    mode: overwrite
 
