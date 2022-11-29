@@ -43,7 +43,7 @@
             "args": [
                 "run",
                 "--pipeline",
-                "data_creation",
+                "preprocessing",
                 "--node",
                 "create_raw_data",
             ]

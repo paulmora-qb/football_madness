@@ -3,11 +3,6 @@
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://kedro.readthedocs.io/en/stable/05_data/01_data_catalog.html
 
-_csv: &csv
-  type: pandas.CSVDataSet
-  save_args:
-    index: False
-
 all_euro_data_2000_2023:
   type: PartitionedDataSet
   dataset:
@@ -18,6 +13,10 @@ all_euro_data_2000_2023:
   path: ./data/01_raw
   filename_suffix: .xls
 
+filtered_schema:
+  type: json.JSONDataSet
+  filepath: data/01_raw/filtered_dataset_schema.json
+
 concatenated_raw_data:
   type: spark.SparkDataSet
   filepath: ./data/02_intermediate/concatenated_raw_data
@@ -27,24 +26,6 @@ concatenated_raw_data:
     schema:
       filepath: ./data/01_raw/filtered_schema.json
   save_args:
-    sep: '|'
     header: True
+    partitionBy: league
 
-filtered_schema:
-  type: json.JSONDataSet
-  filepath: ./data/01_raw/filtered_schema.json
-
-filtered_dataset_schema:
-  type: json.JSONDataSet
-  filepath: data/01_raw/filtered_dataset_schema.json
-
-all_league_raw_data:
-  type: spark.SparkDataSet
-  filepath: ./data/02_intermediate/all_league_raw_data
-  file_format: parquet
-  load_args:
-    header: True
-    inferSchema: True
-  save_args:
-    header: True
-    inferSchema: True
