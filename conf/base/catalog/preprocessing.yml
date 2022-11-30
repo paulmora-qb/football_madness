@@ -18,7 +18,7 @@ filtered_schema:
   filepath: data/01_raw/filtered_schema.json
 
 concatenated_raw_data:
-  type: spark.SparkDataSet
+  type: src.football_madness.extras.datasets.sparkdataset.PandasAPISparkDataSet
   filepath: ./data/02_intermediate/concatenated_raw_data
   file_format: parquet
   load_args:

@@ -46,6 +46,8 @@
                 "feature_engineering",
                 "--node",
                 "create_team_spine",
+                "--node",
+                "create_momentum_features",
             ]
         },
     ]

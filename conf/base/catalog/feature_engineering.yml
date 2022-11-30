@@ -1,6 +1,6 @@
 
 _pq: &pq
-  type: spark.SparkDataSet
+  type: src.football_madness.extras.datasets.sparkdataset.PandasAPISparkDataSet
   file_format: parquet
   save_args:
     mode: overwrite
