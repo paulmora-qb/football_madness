@@ -1,6 +1,23 @@
 
 feature_engineering:
   momentum_features:
-    cols:
-      - a
-      - b
+    - window:
+      order_by: ["team", "date"]
+      aggregation_columns:
+        - full_time_team_goals
+        - half_time_team_goals
+        - team_shots_target
+        - full_time_opponent_goals
+        - half_time_opponent_goals
+        - opponent_shots_target
+      aggregation_type: mean
+      aggregation_window: [5]
+      suffix: _last_games
+    - window:
+      order_by: ["team", "date"]
+      aggregation_columns:
+        - team_yellows
+        - team_reds
+      aggregation_type: count
+      aggregation_window: [1]
+      suffix: _previous_game

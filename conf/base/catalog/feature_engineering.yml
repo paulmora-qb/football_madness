@@ -9,3 +9,5 @@ _pq: &pq
 team_spine:
   <<: *pq
   filepath: ./data/04_feature/team_spine
+  load_args:
+    partitionBy: league

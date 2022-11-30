@@ -38,6 +38,7 @@ def _create_generic_team_data(
     team_renaming_dict = {
         col: col.replace(f"{team_type}", "team") for col in team_data_columns
     }
+    team_renaming_dict[f"{team_type}_team"] = "team"
     team_data = team_data.rename(columns=team_renaming_dict)
     team_data.loc[:, "home_away_indication"] = team_type
 
@@ -56,6 +57,13 @@ def _create_generic_team_data(
     opponent_data = opponent_data.rename(columns=opponent_renaming_dict)
 
     total_data = ps.concat([team_data, opponent_data], axis=1)
+
+    from datetime import datetime
+
+    total_data.loc["date_diff"] = (
+        ps.to_datetime(total_data.loc[:, "date"]) - datetime.today()
+    )
+
     return total_data
 
 

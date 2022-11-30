@@ -23,6 +23,7 @@ concatenated_raw_data:
   file_format: parquet
   load_args:
     header: True
+    partitionBy: league
   save_args:
     header: True
     partitionBy: league
