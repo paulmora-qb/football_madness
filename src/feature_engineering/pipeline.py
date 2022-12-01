@@ -3,7 +3,7 @@
 
 from kedro.pipeline import Pipeline
 
-from .nodes import team_spine_node
+from .nodes import momentum_features_node, team_spine_node
 
 
 def create_feature_engineering_pipeline() -> Pipeline:
@@ -12,5 +12,5 @@ def create_feature_engineering_pipeline() -> Pipeline:
     Returns:
         Pipeline
     """
-    nodes = [team_spine_node]
+    nodes = [team_spine_node, momentum_features_node]
     return Pipeline(nodes)

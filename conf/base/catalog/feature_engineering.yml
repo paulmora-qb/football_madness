@@ -5,9 +5,9 @@ _pq: &pq
   save_args:
     mode: overwrite
     partitionBy: league
+  load_args:
+    partitionBy: league
 
 team_spine:
   <<: *pq
   filepath: ./data/04_feature/team_spine
-  load_args:
-    partitionBy: league

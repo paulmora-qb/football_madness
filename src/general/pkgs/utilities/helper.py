@@ -1,5 +1,6 @@
 """General helper functions"""
 
+import importlib
 from typing import Callable, Iterable, List
 
 from pyspark.sql import SparkSession
@@ -29,5 +30,12 @@ def _validate_keys(provided_keys: Iterable[str], mandatory_keys: List[str]):
 
 
 def load_obj(object_path: str) -> Callable:
-    a = 1
-    pass
+
+    object_path, object_name = object_path.rsplit(".", 1)
+    module_object = importlib.import_module(object_path)
+
+    if not hasattr(module_object, object_name):
+        raise AttributeError(
+            f"The object {object_path} does not have function {object_name}"
+        )
+    return getattr(module_object, object_name)

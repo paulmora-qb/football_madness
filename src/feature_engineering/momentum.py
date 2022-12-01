@@ -1,29 +1,26 @@
 """Creation of momentum features"""
 
-import pyspark.pandas as ps
+from pyspark.sql import DataFrame
 
 from src.general.pkgs.utilities.helper import _validate_keys, load_obj
 
 
-def create_momentum_features(team_spine, params) -> ps.DataFrame:
+def create_momentum_features(team_spine, params) -> DataFrame:
 
-    spark_team_spine = team_spine.to_spark()
-    sorted_spine = spark_team_spine.orderBy(["team", "date"])
-    for window in params:
+    for param in params:
         _validate_keys(
-            window.keys(),
+            param.keys(),
             [
+                "function",
+                "partition_by",
                 "order_by",
                 "aggregation_columns",
                 "aggregation_type",
-                "aggregation_window",
+                "aggregation_range",
                 "suffix",
             ],
         )
 
-    sorted_spine
-
-    test.groupby(window["order_by"])[
-        "full_time_team_goals", "half_time_team_goals"
-    ].transform(rolling)
-
+        function_path = param.pop("function")
+        func = load_obj(function_path)
+        list_of_functions = func(**param)
