@@ -24,3 +24,6 @@ def create_momentum_features(team_spine, params) -> DataFrame:
         function_path = param.pop("function")
         func = load_obj(function_path)
         list_of_functions = func(**param)
+
+    team_spine.withColumn("test", list_of_functions[0])
+

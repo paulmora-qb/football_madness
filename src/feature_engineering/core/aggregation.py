@@ -24,15 +24,15 @@ def create_window_aggregates(
     for col in aggregation_columns:
         start_range = aggregation_range[0]
         end_range = aggregation_range[1]
-        window = (
+        w = (
             Window.partitionBy(partition_by)
             .orderBy(order_by)
             .rangeBetween(start_range, end_range)
         )
 
         output_column_name = f"{prefix}_{col}_{suffix}"
-        output_column_list.load_obj(aggregation_type).over(window).alias(
-            output_column_name
+        output_column_list.append(
+            load_obj(aggregation_type)(f.col(col)).over(w).alias(output_column_name)
         )
     return output_column_list
 
