@@ -1,29 +1,24 @@
 """Creation of momentum features"""
 
+import re
+
 from pyspark.sql import DataFrame
 
-from src.general.pkgs.utilities.helper import _validate_keys, load_obj
+from src.general.pkgs.utilities.helper import load_obj
 
 
-def create_momentum_features(team_spine, params) -> DataFrame:
+def create_momentum_features(team_spine, momentum_feature_params) -> DataFrame:
 
-    for param in params:
-        _validate_keys(
-            param.keys(),
-            [
-                "function",
-                "partition_by",
-                "order_by",
-                "aggregation_columns",
-                "aggregation_type",
-                "aggregation_range",
-                "suffix",
-            ],
-        )
+    core_columns = ["team", "season", "datediff"]
 
+    for param in momentum_feature_params:
         function_path = param.pop("function")
         func = load_obj(function_path)
-        list_of_functions = func(**param)
+        list_of_new_columns = func(**param)
 
-    team_spine.withColumn("test", list_of_functions[0])
+        for col in list_of_new_columns:
+            team_spine = team_spine.select("*", col)
 
+    regex = re.compile("window_.*")
+    feature_columns = core_columns + list(filter(regex.match, team_spine.columns))
+    return team_spine.select(feature_columns).na.drop()

@@ -9,30 +9,42 @@ from pyspark.sql.window import Window
 from general.pkgs.utilities.helper import load_obj
 
 
+def create_last_season_indicator():
+    pass
+
+
 def create_window_aggregates(
     partition_by: List[str],
     order_by: List[str],
     aggregation_columns: List[str],
     aggregation_type: str,
-    aggregation_range: List[int],
-    prefix: str,
-    suffix: str,
+    rows_between: List[int],
+    range_between: List[int] = None,
+    prefix: str = None,
+    suffix: str = None,
 ) -> List[f.col]:
 
+    ranges = rows_between or range_between
     output_column_list = []
 
     for col in aggregation_columns:
-        start_range = aggregation_range[0]
-        end_range = aggregation_range[1]
-        w = (
-            Window.partitionBy(partition_by)
-            .orderBy(order_by)
-            .rangeBetween(start_range, end_range)
+        window = Window.partitionBy(partition_by).orderBy(order_by)
+
+        if rows_between:
+            window = window.rowsBetween(ranges[0], ranges[1])
+            range_str = "row"
+        else:
+            window = window.rangeBetween(ranges[0], ranges[1])
+            range_str = "range"
+
+        output_column_name = (
+            f"{prefix}_{col}_{range_str}{abs(ranges[0])}_{range_str}{abs(ranges[1])}"
         )
 
-        output_column_name = f"{prefix}_{col}_{suffix}"
         output_column_list.append(
-            load_obj(aggregation_type)(f.col(col)).over(w).alias(output_column_name)
+            load_obj(aggregation_type)(f.col(col))
+            .over(window)
+            .alias(output_column_name)
         )
     return output_column_list
 

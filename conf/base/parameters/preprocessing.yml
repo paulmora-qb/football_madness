@@ -4,6 +4,7 @@ data_preparation:
   renaming_columns:
     Div: league
     Date: date
+    season: season
     HomeTeam: home_team
     AwayTeam: away_team
     FTHG: full_time_home_goals

@@ -212,9 +212,10 @@ class AdjustedExcelDataSet(AbstractVersionedDataSet):
             ]
 
         load_path = f"{self._protocol}{PROTOCOL_DELIMITER}{load_path}"
-        return pd.read_excel(
+        data = pd.read_excel(
             load_path, storage_options=self._storage_options, **self._load_args
         )
+        return data
 
     def _save(self, data: Union[pd.DataFrame, Dict[str, pd.DataFrame]]) -> None:
         output = BytesIO()

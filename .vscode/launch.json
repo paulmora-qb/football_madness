@@ -48,5 +48,18 @@
                 "create_momentum_features"
             ]
         },
+        {
+            "name": "Pytest func",
+            "type": "python",
+            "request": "launch",
+            "justMyCode": true,
+            "module": "pytest",
+            "args": [
+                "--no-cov",
+                "--capture=no",
+                "-k",
+                "test_create_momentum_features"
+            ]
+        },
     ]
 }

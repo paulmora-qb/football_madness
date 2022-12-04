@@ -1,5 +1,6 @@
 """Function for loading the raw data"""
 
+import re
 from typing import Any, Dict
 
 import pandas as pd
@@ -32,8 +33,9 @@ def concatenate_raw_data(
 
     master_df = pd.DataFrame()
 
-    for dataframe_value in tqdm(partition_data_dict.values()):
-        temp_expanded_df = pd.concat(dataframe_value().values())
+    for df_key, df_value in tqdm(partition_data_dict.items()):
+        temp_expanded_df = pd.concat(df_value().values())
+        temp_expanded_df.loc[:, "season"] = re.search("[0-9]+-[0-9]+", df_key).group()
         master_df = pd.concat([master_df, temp_expanded_df])
 
     # Filter and rename columns

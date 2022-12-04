@@ -5,12 +5,26 @@ from pyspark.sql import functions as f
 
 
 def _create_generic_team_data(match_data: DataFrame, team_type: str) -> DataFrame:
+    """This function creates an overview of the team performance from the perspective
+    of the home/away team. That facilitates the subsequent feature creation
 
-    # Column renaming
+    Args:
+        match_data (DataFrame): The concatenated dataframe of all football results
+        team_type (str): Indication whether the team was playing home/ away
+
+    Returns:
+        DataFrame: A dataframe from the perspective of the home/away team
+    """
+
+    # Clarifying home/ away team
     if team_type == "home":
         opponent_type = "away"
+        win_lose_dict = {"H": "win", "A": "loss", "D": "draw"}
     else:
         opponent_type = "home"
+        win_lose_dict = {"A": "win", "H": "loss", "D": "draw"}
+
+    # Column renaming
     original_column_names = match_data.columns
     adj_column_names = []
     for col in original_column_names:
@@ -28,6 +42,15 @@ def _create_generic_team_data(match_data: DataFrame, team_type: str) -> DataFram
 
     # Dropping opponent name
     match_data = match_data.drop(f"{opponent_type}_team")
+
+    # Creation of difference in days column
+    match_data = match_data.withColumn(
+        "datediff", f.datediff(f.col("date"), f.current_date())
+    )
+
+    # Clarifying which team won from the perspective of the home/away team
+    match_data = match_data.replace(win_lose_dict, subset="full_time_result")
+
     return match_data
 
 
