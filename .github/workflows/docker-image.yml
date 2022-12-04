@@ -34,5 +34,5 @@ jobs:
         with:
           context: .
           file: ./.devcontainer/Dockerfile
-          push: true
+          push: false
           tags: 1.0.0
