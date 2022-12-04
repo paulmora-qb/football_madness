@@ -8,6 +8,14 @@ _pq: &pq
   load_args:
     partitionBy: league
 
+match_spine:
+  <<: *pq
+  filepath: ./data/04_feature/match_spine
+
 team_spine:
   <<: *pq
   filepath: ./data/04_feature/team_spine
+
+momentum_features:
+  <<: *pq
+  filepath: ./data/04_features/momentum

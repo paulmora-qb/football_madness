@@ -1,5 +1,7 @@
 """Create team spine"""
 
+from typing import Dict
+
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
 
@@ -74,3 +76,17 @@ def create_team_spine(match_data: DataFrame) -> DataFrame:
     team_spine = home_team_data.unionByName(away_team_data)
 
     return team_spine
+
+
+def create_match_spine(match_data: DataFrame, params: Dict[str, str]) -> DataFrame:
+    """This function creates the backbone of the matches, to which we are then merging
+    the features created in the feature engineering pipeline
+
+    Args:
+        match_data (DataFrame): Dataframe with all available columns
+
+    Returns:
+        DataFrame: Dataframe containing only the relevant merging variables
+            for each game, which are home-team, away-team and the date
+    """
+    return match_data.select(params["keys"])

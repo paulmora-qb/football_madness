@@ -1,35 +1,37 @@
 
-feature_engineering:
-  momentum_features:
-    - function: feature_engineering.core.aggregation.create_window_aggregates
-      partition_by: ["team", "season"]
-      order_by: ["datediff"]
-      aggregation_columns:
-        - full_time_goals
-        - shots_target
-        - full_time_opponent_goals
-        - opponent_shots_target
-      aggregation_type: pyspark.sql.functions.avg
-      rows_between: [-3, -1]
-      prefix: window
-      suffix: last_games
-    # - function: feature_engineering.core.aggregation.create_window_aggregates
-    #   partition_by: ["team"]
-    #   order_by: ["datediff"]
-    #   aggregation_columns:
-    #     - yellows
-    #     - reds
-    #   aggregation_type: pyspark.sql.functions.sum
-    #   rows_between: [-1, -1]
-    #   prefix: lag
-    #   suffix: previous_game
-    # - function: feature_engineering.core.aggregation.create_last_season_indicator
-    #   partition_by: ["team"]
-    #   order_by: ["date"]
-    #   aggregation_columns:
-    #     - team_yellows
-    #     - team_reds
-    #   aggregation_type: pyspark.sql.functions.sum
-    #   rows_between: [1, 1]
-    #   prefix: number_of
-    #   suffix: previous_game
+ftr_match_spine:
+  keys: ["home_team", "away_team", "date", "league"]
+
+ftr_momentum:
+  - function: feature_engineering.core.aggregation.create_window_aggregates
+    partition_by: ["team", "season"]
+    order_by: ["datediff"]
+    aggregation_columns:
+      - full_time_goals
+      - shots_target
+      - full_time_opponent_goals
+      - opponent_shots_target
+    aggregation_type: pyspark.sql.functions.avg
+    rows_between: [-3, -1]
+    prefix: window
+    suffix: last_games
+  # - function: feature_engineering.core.aggregation.create_window_aggregates
+  #   partition_by: ["team"]
+  #   order_by: ["datediff"]
+  #   aggregation_columns:
+  #     - yellows
+  #     - reds
+  #   aggregation_type: pyspark.sql.functions.sum
+  #   rows_between: [-1, -1]
+  #   prefix: lag
+  #   suffix: previous_game
+  # - function: feature_engineering.core.aggregation.create_last_season_indicator
+  #   partition_by: ["team"]
+  #   order_by: ["date"]
+  #   aggregation_columns:
+  #     - team_yellows
+  #     - team_reds
+  #   aggregation_type: pyspark.sql.functions.sum
+  #   rows_between: [1, 1]
+  #   prefix: number_of
+  #   suffix: previous_game

@@ -2,7 +2,7 @@
 
 from kedro.pipeline import node
 
-from .extract_transform_load import concatenate_raw_data
+from ..functions.extract_transform_load import concatenate_raw_data
 
 concatenate_raw_data_node = node(
     func=concatenate_raw_data,

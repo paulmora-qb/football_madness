@@ -8,16 +8,17 @@
             "name": "Run Pipeline",
             "type": "python",
             "request": "launch",
+            "cwd": ".",
             "justMyCode": false,
             "module": "kedro",
             "args": [
                 "run",
                 "--pipeline",
-                "preprocess_images",
+                "feature_engineering",
             ]
         },
         {
-            "name": "Run Tag",
+            "name": "Run Node",
             "type": "python",
             "request": "launch",
             "cwd": ".",
@@ -26,26 +27,9 @@
             "args": [
                 "run",
                 "--pipeline",
-                "feature_engineering",
-                "--tag",
-                "test",
-                "--tag",
-                "training",
-            ]
-        },
-        {
-            "name": "Run Node",
-            "type": "python",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "justMyCode": false,
-            "module": "kedro",
-            "args": [
-                "run",
-                "--pipeline",
-                "feature_engineering",
+                "preprocessing",
                 "--node",
-                "create_momentum_features"
+                "create_raw_data",
             ]
         },
         {

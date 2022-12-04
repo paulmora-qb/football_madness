@@ -8,7 +8,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.types import StructType
 from tqdm import tqdm
 
-from general.pkgs.utilities.helper import _get_spark_session
+from utilities.helper import _get_spark_session
 
 
 def concatenate_raw_data(
@@ -48,7 +48,26 @@ def concatenate_raw_data(
     return spark_df
 
 
-def _select_and_rename_columns(data, renaming_dict) -> pd.DataFrame:
+def _select_and_rename_columns(
+    data: pd.DataFrame, renaming_dict: Dict[str, str]
+) -> pd.DataFrame:
+    """This function ingests data and a dictionary with which we are renaming
+    columns. We are basically doing two things. For once we are keeping certain
+    columns and the other step is that we are renaming the columns which have an
+    unfortunate/ complicated name.
+
+    Args:
+        data (pd.DataFrame): Raw concatenated data with all columns
+        renaming_dict (Dict[str, str]): Dictionary with key-value pair for renaming
+            the columns
+
+    Raises:
+        KeyError: If we find that there are columns we would like to keep but we could
+            not find them in the dataset
+
+    Returns:
+        pd.DataFrame: Dataframes with renamed column names
+    """
 
     # Select relevant columns
     columns_to_keep = list(renaming_dict.keys())

@@ -1,3 +1,3 @@
 """Data Creation"""
 
-from .pipeline import create_feature_engineering_pipeline
+from .pipelines.pipeline import create_feature_engineering_pipeline

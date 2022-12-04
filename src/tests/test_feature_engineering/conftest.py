@@ -11,11 +11,6 @@ from general.pkgs.utilities.helper import _get_spark_session
 
 class Helper:
     @staticmethod
-    def transform_nan_into_null(df: DataFrame):
-        df.replace(float("nan"), None).show()
-        return df
-
-    @staticmethod
     def assert_df_equality(df1: DataFrame, df2: DataFrame, key_columns: List[str]):
         sorted_df1 = df1.sort(key_columns)
         sorted_df2 = df2.sort(key_columns)

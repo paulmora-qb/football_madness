@@ -1,7 +1,15 @@
 from kedro.pipeline import node
 
-from .momentum import create_momentum_features
-from .team_spine import create_team_spine
+from ..functions.momentum import create_momentum_features
+from ..functions.spine import create_match_spine, create_team_spine
+
+match_spine_node = node(
+    func=create_match_spine,
+    inputs=["concatenated_raw_data", "params:ftr_match_spine"],
+    outputs="match_spine",
+    name="create_match_spine",
+    tags=["feature_engineering"],
+)
 
 team_spine_node = node(
     func=create_team_spine,
@@ -13,7 +21,7 @@ team_spine_node = node(
 
 momentum_features_node = node(
     func=create_momentum_features,
-    inputs=["team_spine", "params:feature_engineering.momentum_features"],
+    inputs=["team_spine", "params:ftr_momentum"],
     outputs="momentum_features",
     name="create_momentum_features",
     tags=["feature_engineering"],
