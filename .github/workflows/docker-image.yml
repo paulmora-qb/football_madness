@@ -35,4 +35,4 @@ jobs:
           context: .
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ghcr.io/user/app:latest
+          tags: 1.0.0
