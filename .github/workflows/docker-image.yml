@@ -36,3 +36,6 @@ jobs:
           file: ./.devcontainer/Dockerfile
           push: false
           tags: 1.0.0
+      -
+        name: Run pytests
+        run: pytest ./src/tests
