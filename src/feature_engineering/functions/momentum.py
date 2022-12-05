@@ -9,7 +9,7 @@ from utilities.helper import load_obj
 
 def create_momentum_features(team_spine, momentum_feature_params) -> DataFrame:
 
-    core_columns = ["team", "season", "datediff"]
+    core_columns = ["team", "season", "date", "league", "home_away_indication"]
 
     for param in momentum_feature_params:
         function_path = param.pop("function")

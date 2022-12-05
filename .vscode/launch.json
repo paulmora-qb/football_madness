@@ -27,9 +27,9 @@
             "args": [
                 "run",
                 "--pipeline",
-                "preprocessing",
+                "modeling",
                 "--node",
-                "create_raw_data",
+                "creation_of_master_table",
             ]
         },
         {

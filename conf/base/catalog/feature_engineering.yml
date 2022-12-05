@@ -16,6 +16,6 @@ team_spine:
   <<: *pq
   filepath: ./data/04_feature/team_spine
 
-momentum_features:
+ftr_momentum:
   <<: *pq
-  filepath: ./data/04_features/momentum
+  filepath: ./data/04_feature/momentum

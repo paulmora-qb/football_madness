@@ -6,7 +6,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
 from pyspark.sql.window import Window
 
-from general.pkgs.utilities.helper import load_obj
+from utilities.helper import load_obj
 
 
 def create_last_season_indicator():
