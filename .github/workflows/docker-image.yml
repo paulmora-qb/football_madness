@@ -34,7 +34,7 @@ jobs:
         with:
           context: .
           file: ./.devcontainer/Dockerfile
-          push: false
+          push: true
           tags: 1.0.0
       -
         name: Run pytests
