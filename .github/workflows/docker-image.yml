@@ -35,7 +35,7 @@ jobs:
           context: .
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository }}/server:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository }}/server:${{ github.sha }}
       -
         name: Run pytests
         run: pytest ./src/tests
