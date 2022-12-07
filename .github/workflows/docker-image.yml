@@ -35,7 +35,7 @@ jobs:
           context: .
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: 1.0.0
+          tags: paulmora-qb/football_madness:latest
       -
         name: Run pytests
         run: pytest ./src/tests
