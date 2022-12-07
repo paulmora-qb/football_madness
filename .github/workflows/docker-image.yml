@@ -35,7 +35,7 @@ jobs:
           context: .
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ github.repository }}:latest
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:latest
       -
         name: Run pytests
         run: pytest ./src/tests
