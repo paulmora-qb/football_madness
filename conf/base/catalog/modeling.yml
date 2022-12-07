@@ -1,0 +1,13 @@
+
+_pq: &pq
+  type: spark.SparkDataSet
+  file_format: parquet
+  save_args:
+    mode: overwrite
+    partitionBy: league
+  load_args:
+    partitionBy: league
+
+master_table:
+  <<: *pq
+  filepath: ./data/04_feature/master_table
