@@ -2,7 +2,7 @@
 
 from kedro.pipeline import node
 
-from ...functions.master_table_functions import create_match_data_master_table
+from ...functions.master_table import create_match_data_master_table
 
 master_table_node = node(
     func=create_match_data_master_table,

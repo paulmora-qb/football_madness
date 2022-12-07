@@ -2,3 +2,5 @@
 master_table:
   feature_families:
     - ftr_momentum
+
+splitting_params:

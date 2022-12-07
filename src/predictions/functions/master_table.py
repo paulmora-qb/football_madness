@@ -49,7 +49,7 @@ def _retrieve_team_features(
     non_feature_columns = ["date", "home_away_indication", "league"]
     ftr_team_segment = ftr_dataframe.filter(
         f.col("home_away_indication") == team_indication
-    )
+    ).drop(*["home_away_indication"])
     feature_columns = [
         col for col in ftr_team_segment.columns if col not in non_feature_columns
     ]
