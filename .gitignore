@@ -24,7 +24,7 @@ logs/**
 
 ##########################
 # IDE related
-.vscode
+.vscode/
 
 ##########################
 # Common files

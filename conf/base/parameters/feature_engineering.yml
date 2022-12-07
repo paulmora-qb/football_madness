@@ -1,6 +1,6 @@
 
 ftr_match_spine:
-  keys: ["home_team", "away_team", "date", "season", "league"]
+  keys: ["home_team", "away_team", "date", "league"]
 
 ftr_momentum:
   - function: feature_engineering.functions.aggregation.create_window_aggregates
