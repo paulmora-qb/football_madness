@@ -34,8 +34,14 @@ jobs:
         with:
           context: .
           file: ./.devcontainer/Dockerfile
-          push: false
-          tags: 1.0.0
+          push: true
+          tags: ghcr.io/${{ github.repository }}/server:${{ github.sha }}
       -
         name: Run pytests
-        run: pytest ./src/tests
+        uses: addnab/docker-run-action@v3
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: gcr.io
+          image: ghcr.io/${{ github.repository }}/server:${{ github.sha }}
+          run: echo "$PWD"
