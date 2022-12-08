@@ -1,6 +1,6 @@
 """Master table functions"""
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from kedro.framework.session import get_current_session
 from kedro.io.core import DataSetNotFoundError
@@ -8,27 +8,44 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
 
 
-def _load_datasets_using_string(catalog_names: List[str]) -> List[DataFrame]:
-    """This function loads the dataframes which are indicated in the inputted list.
+def _load_dataframe_using_string(catalog, catalog_name: str) -> DataFrame:
+    """Loading the dataframe using a string which points to an entry in the catalog
 
     Args:
-        catalog_names (List[str]): List of all the dataframe names which have to be
-            indicated in the catalog.
+        catalog: Catalog of the current session
+        catalog_name (str): Name of the dataframe that should be loaded
 
     Returns:
-        List[DataFrame]: List of all pyspark dataframes loaded through the configuration
+        DataFrame: Loaded dataframe
+    """
+
+    try:
+        data = catalog.load(catalog_name)
+        return data
+    except DataSetNotFoundError:
+        print(f"Dataset called {catalog_name} cannot be found in the catalog")
+
+
+def _load_datasets(catalog_names: Any) -> Any:
+    """This function loads datasets either through a list or a string which is tested
+
+    Args:
+        catalog_names (Any): Either a string with a dataframe name, or an entire list
+            of them
+
+    Returns:
+        Any: Loaded dataframe(s)
     """
     current_session = get_current_session()
     catalog = current_session.load_context().catalog
 
-    dfs = []
-    for cg_name in catalog_names:
-        try:
-            data = catalog.load(cg_name)
-            dfs.append(data)
-        except DataSetNotFoundError:
-            print(f"Dataset called {cg_name} cannot be found in the catalog")
-    return dfs
+    if isinstance(catalog_names, list):
+        dfs = []
+        for cg_name in catalog_names:
+            dfs.append(_load_dataframe_using_string(catalog, cg_name))
+        return dfs
+    else:
+        return _load_dataframe_using_string(catalog, catalog_names)
 
 
 def _retrieve_team_features(
@@ -77,12 +94,13 @@ def create_match_data_master_table(
         DataFrame: Master table dataframe
     """
 
-    feature_dfs = _load_datasets_using_string(params["feature_families"])
-    return adding_features_to_master_table(match_data, *feature_dfs)
+    feature_dfs = _load_datasets(params["feature_families"])
+    target_df = _load_datasets(params["target_df"])
+    return adding_features_to_master_table(match_data, target_df, *feature_dfs)
 
 
 def adding_features_to_master_table(
-    match_data: DataFrame, *dfs: List[DataFrame]
+    match_data: DataFrame, target_df: DataFrame, *feature_dfs: List[DataFrame],
 ) -> DataFrame:
     """This function creates the master table which is the basis for the modelling
     pipeline. In here we are taking the match_data table, which contains the information
@@ -93,15 +111,16 @@ def adding_features_to_master_table(
     Args:
         match_data (DataFrame): Dataframe containing the match data for all games and
             on which date the game was played
-        params (Dict[str, str]): Parameters including the feature families that we are
-            merging towards the master spine
+        target_df (DataFrame): Dataframe containing the target variable
+        feature_dfs* (List[DataFrame]): List of pyspark dataframes to be added to the
+            master table
 
     Returns:
         DataFrame: The master table is returned, which is the match_data 'spine' with
             all the feature families attached to it
     """
 
-    for df in dfs:
+    for df in feature_dfs:
         for team_indication in ["away", "home"]:
             ftr_dataframe_single_segment = _retrieve_team_features(df, team_indication)
             match_data = match_data.join(
@@ -109,5 +128,9 @@ def adding_features_to_master_table(
                 on=[f"{team_indication}_team", "date", "league"],
                 how="left",
             )
-        return match_data
+    match_data = match_data.join(
+        target_df, on=["home_team", "away_team", "date", "league"], how="inner"
+    )
+
+    return match_data
 

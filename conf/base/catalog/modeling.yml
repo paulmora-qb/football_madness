@@ -8,6 +8,10 @@ _pq: &pq
   load_args:
     partitionBy: league
 
+target_variable:
+  <<: *pq
+  filepath: ./data/04_feature/target_variable
+
 master_table:
   <<: *pq
   filepath: ./data/04_feature/master_table

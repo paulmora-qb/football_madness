@@ -1,6 +1,22 @@
 
+target_variable:
+  keys: 
+    - home_team
+    - away_team
+    - date
+    - league
+  target_column_name: full_time_result
+
+
 master_table:
+  target_df: target_variable
   feature_families:
     - ftr_momentum
 
 splitting_params:
+  function: sklearn.model_selection.StratifiedShuffleSplit
+  function_params:
+    n_splits: 1
+    train_size: 0.8
+    random_state: 42
+  target_column_name: full_time_result

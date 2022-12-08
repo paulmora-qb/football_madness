@@ -2,12 +2,12 @@
 
 from kedro.pipeline import Pipeline, node
 
-from .nodes.master_table import master_table_node
+from .nodes.master_table import master_table_node, target_creation_node
 from .nodes.training import splitting_node
 
 
 def create_master_pipeline() -> Pipeline:
-    nodes = [master_table_node]
+    nodes = [target_creation_node, master_table_node]
     return Pipeline(nodes)
 
 
