@@ -38,9 +38,6 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/server:${{ github.sha }}
       -
         name: Run pytests
-        run: pytest ./src/tests
-      -
-        name: Run pytests
         uses: addnab/docker-run-action@v3
         with:
           username: ${{ github.repository_owner }}
