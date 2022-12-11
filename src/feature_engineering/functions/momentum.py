@@ -19,6 +19,7 @@ def create_momentum_features(team_spine, momentum_feature_params) -> DataFrame:
         for col in list_of_new_columns:
             team_spine = team_spine.select("*", col)
 
-    regex = re.compile("window_.*")
+    # TODO: Rethink the selection of the features through that mechanism
+    regex = re.compile("ftr_window_.*")
     feature_columns = core_columns + list(filter(regex.match, team_spine.columns))
     return team_spine.select(feature_columns).na.drop()

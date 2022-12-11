@@ -15,3 +15,7 @@ target_variable:
 master_table:
   <<: *pq
   filepath: ./data/04_feature/master_table
+
+train_test_splitted_data:
+  <<: *pq
+  filepath: ./data/05_model_input/train_test_splitted_data

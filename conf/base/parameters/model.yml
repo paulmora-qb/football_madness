@@ -1,12 +1,11 @@
 
 target_variable:
+  target_column_name: full_time_result
   keys: 
     - home_team
     - away_team
     - date
     - league
-  target_column_name: full_time_result
-
 
 master_table:
   target_df: target_variable
@@ -14,9 +13,12 @@ master_table:
     - ftr_momentum
 
 splitting_params:
-  function: sklearn.model_selection.StratifiedShuffleSplit
-  function_params:
-    n_splits: 1
-    train_size: 0.8
-    random_state: 42
   target_column_name: full_time_result
+  unique_target_category_values: ["H", "D", "A"]
+  train_size: 0.8
+  seed: 42
+
+imputing_params:
+  function: pyspark.ml.feature.Imputer
+  function_params:
+    strategy: mean

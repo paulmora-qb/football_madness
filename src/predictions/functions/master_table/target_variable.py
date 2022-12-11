@@ -2,6 +2,7 @@
 from typing import Dict
 
 from pyspark.sql import DataFrame
+from pyspark.sql import functions as f
 
 
 def create_target_variable(raw_data: DataFrame, params: Dict[str, str]) -> DataFrame:
@@ -24,6 +25,6 @@ def create_target_variable(raw_data: DataFrame, params: Dict[str, str]) -> DataF
     if isinstance(target_column_name, str):
         target_column_name = [target_column_name]
 
-    return raw_data.select(key_columns + target_column_name).na.drop(
-        subset=target_column_name
+    return raw_data.select(key_columns + target_column_name).filter(
+        ~f.isnan(f.col(*target_column_name))
     )

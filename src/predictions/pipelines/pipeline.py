@@ -3,7 +3,7 @@
 from kedro.pipeline import Pipeline, node
 
 from .nodes.master_table import master_table_node, target_creation_node
-from .nodes.training import splitting_node
+from .nodes.training import imputing_node, splitting_node
 
 
 def create_master_pipeline() -> Pipeline:
@@ -12,7 +12,7 @@ def create_master_pipeline() -> Pipeline:
 
 
 def create_training_pipeline() -> Pipeline:
-    nodes = [splitting_node]
+    nodes = [splitting_node, imputing_node]
     return Pipeline(nodes)
 
 

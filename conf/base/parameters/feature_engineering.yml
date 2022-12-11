@@ -13,7 +13,7 @@ ftr_momentum:
       - opponent_shots_target
     aggregation_type: pyspark.sql.functions.avg
     rows_between: [-3, -1]
-    prefix: window
+    prefix: ftr_window
     suffix: last_games
   # - function: feature_engineering.core.aggregation.create_window_aggregates
   #   partition_by: ["team"]
