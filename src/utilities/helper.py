@@ -1,9 +1,16 @@
 """General helper functions"""
 
 import importlib
-from typing import Callable, Iterable, List
+from typing import Any, Callable, Dict, Iterable, List
 
 from pyspark.sql import SparkSession
+
+
+def update_dictionary(
+    original_dict: Dict[str, str], key: str, value: Any,
+) -> Dict[str, str]:
+    original_dict[key] = value
+    return original_dict
 
 
 def _find_list_elements_using_keyword(

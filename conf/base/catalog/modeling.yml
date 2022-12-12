@@ -8,6 +8,13 @@ _pq: &pq
   load_args:
     partitionBy: league
 
+_pickle: &pickle
+  type: pickle.PickleDataSet
+
+data_dictionary:
+  type: pickle.PickleDataSet
+  filepath: ./data/05_model_input/data_dictionary.pkl
+
 target_variable:
   <<: *pq
   filepath: ./data/04_feature/target_variable
@@ -19,3 +26,11 @@ master_table:
 train_test_splitted_data:
   <<: *pq
   filepath: ./data/05_model_input/train_test_splitted_data
+
+feature_name_list:
+  type: pickle.PickleDataSet
+  filepath: ./data/05_model_input/feature_name_list.pkl
+
+imputed_data:
+  <<: *pq
+  filepath: ./data/05_model_input/imputed_data

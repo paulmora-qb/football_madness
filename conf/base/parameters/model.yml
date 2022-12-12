@@ -22,3 +22,12 @@ imputing_params:
   function: pyspark.ml.feature.Imputer
   function_params:
     strategy: mean
+
+tuning_params:
+  model:
+    function: pyspark.ml.classification.RandomForestClassifier
+    target_column_name: full_time_result
+  cv:
+    function: pyspark.ml.tuning.CrossValidator
+    param_grid:
+      maxDepth: [5, 10]

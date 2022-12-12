@@ -63,17 +63,24 @@ def _retrieve_team_features(
             renamed columns
     """
 
-    non_feature_columns = ["date", "home_away_indication", "league"]
+    non_feature_columns = ["team", "date", "home_away_indication", "league"]
     ftr_team_segment = ftr_dataframe.filter(
         f.col("home_away_indication") == team_indication
     ).drop(*["home_away_indication"])
     feature_columns = [
         col for col in ftr_team_segment.columns if col not in non_feature_columns
     ]
+
+    # Adding an indication to all features whether they belong to the home/ away team
     for col in feature_columns:
         ftr_team_segment = ftr_team_segment.withColumnRenamed(
-            col, f"{team_indication}_{col}"
+            col, f"{col}_{team_indication}"
         )
+
+    # Adding an information whether the team is home/ away
+    ftr_team_segment = ftr_team_segment.withColumnRenamed(
+        "team", f"{team_indication}_team"
+    )
     return ftr_team_segment
 
 
