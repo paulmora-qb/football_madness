@@ -9,8 +9,8 @@ RUN apt-get update && \
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
 RUN export JAVA_HOME
 
-COPY ./src/requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+COPY ./ .
+RUN pip install --upgrade pip && pip install -r ./src/requirements.txt
 
 ENV PYTHONPATH "${PYTHONPATH}:./src"
 CMD ["/bin/bash"]
