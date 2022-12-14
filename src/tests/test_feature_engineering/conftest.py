@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from pyspark.sql import DataFrame, SparkSession
 
-from general.pkgs.utilities.helper import _get_spark_session
+from utilities.helper import _get_spark_session
 
 
 class Helper:
