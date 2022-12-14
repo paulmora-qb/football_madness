@@ -11,6 +11,7 @@ RUN export JAVA_HOME
 
 COPY ./ .
 RUN pip install --upgrade pip && pip install -r ./src/requirements.txt
+WORKDIR ./src
 
 ENV PYTHONPATH "${PYTHONPATH}:./src"
 CMD ["/bin/bash"]
