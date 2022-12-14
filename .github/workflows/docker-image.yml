@@ -44,4 +44,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: gcr.io
           image: ghcr.io/${{ github.repository }}/server:${{ github.sha }}
-          run: echo "$PWD"
+          run: ls
