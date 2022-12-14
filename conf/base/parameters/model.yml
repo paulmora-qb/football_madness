@@ -19,15 +19,25 @@ splitting_params:
   seed: 42
 
 imputing_params:
-  function: pyspark.ml.feature.Imputer
-  function_params:
+  transformer:
+    object: pyspark.ml.feature.Imputer
     strategy: mean
 
 tuning_params:
-  model:
-    function: pyspark.ml.classification.RandomForestClassifier
-    target_column_name: full_time_result
-  cv:
-    function: pyspark.ml.tuning.CrossValidator
-    param_grid:
-      maxDepth: [5, 10]
+  tuning_func:
+    object: pyspark.ml.tuning.CrossValidator
+    seed: 42
+    parallelism: 6
+    numFolds: 5
+    estimator:
+      object: pyspark.ml.classification.RandomForestClassifier
+      labelCol: full_time_result
+      featuresCol: features
+    evaluator:
+      object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
+      predictionCol: prediction
+      labelCol: full_time_result
+      metricName: f1
+  param_grid:
+    maxDepth: [5, 10]
+  target_col_name: full_time_result

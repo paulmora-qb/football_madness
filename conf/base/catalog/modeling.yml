@@ -31,6 +31,6 @@ feature_name_list:
   type: pickle.PickleDataSet
   filepath: ./data/05_model_input/feature_name_list.pkl
 
-imputed_data:
+assembled_imputed_data:
   <<: *pq
   filepath: ./data/05_model_input/imputed_data

@@ -1,12 +1,10 @@
 """Fine-tune hyper-parameters for modeling"""
 
-from typing import Any, Dict, List
+from random import Random
+from typing import Any, Callable, Dict, List
 
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 from pyspark.sql import DataFrame
-from pyspark.sql import functions as f
-
-from utilities.helper import load_obj
 
 
 def _get_param_grid_ready(
@@ -30,25 +28,16 @@ def _get_param_grid_ready(
     return param_grid_instance.build()
 
 
-def hp_tuning(
-    data: DataFrame, model_params: Dict[str, Any], cv_params: Dict[str, Any],
+def tuner(
+    data: DataFrame, tuner: Callable, param_grid: Dict[str, str], target_col_name
 ) -> Dict[str, str]:
 
-    function_name = model_params.pop("function")
-    function = load_obj(function_name)(**model_params)
+    param_grid_instance = _get_param_grid_ready(tuner.getEstimator(), param_grid)
+    tuner.setParams(estimatorParamMaps=param_grid_instance)
 
-    param_grid = cv_params["param_grid"]
+    from pyspark.ml.classification import RandomForestClassifier
 
-    # TODO: think about how to use that gridbuilder and getparams in an automated way
+    RandomForestClassifier().fit(data)
 
-    train_data = data.filter(f.col("split") == "TRAIN")
+    tuner.fit(data)
 
-    cv_instance_name = cv_params.pop("function")
-    param_grid = cv_params.pop("param_grid")
-    cv_params["estimatorParamMaps"] = _get_param_grid_ready(function, param_grid)
-
-    cross_validator = load_obj(cv_instance_name)(**cv_params)
-
-    # func = load_obj(params["function"])
-
-    # CrossValidator()

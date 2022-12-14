@@ -4,12 +4,12 @@ from functools import partial
 
 from kedro.pipeline import Pipeline, node
 
-from utilities.helper import update_dictionary
+from general.nodes.modeling.model_imputation import imputer
+from general.nodes.modeling.model_tuning import tuner
+from utilities.helper import update_dictionary, vector_assemble
 
 from ...functions.data_dictionary.data_dictionary import create_data_dictionary
-from ...functions.training.imputer import impute_dataframe
 from ...functions.training.splitter import split_train_test_dataframe
-from ...functions.training.tuning import hp_tuning
 
 data_dictionary_node = node(
     func=create_data_dictionary,
@@ -27,10 +27,6 @@ splitting_node = node(
     tags=["modeling"],
 )
 
-# 1: Include additional parameters
-# 2: Update the parameters with the additional parameters
-# 3: Fit and transform the nodes
-
 imputing_nodes = Pipeline(
     nodes=[
         node(
@@ -41,20 +37,37 @@ imputing_nodes = Pipeline(
             tags=["imputation", "modeling"],
         ),
         node(
-            func=partial(update_dictionary, key="feature_names"),
+            func=partial(update_dictionary, level_name="transformer", key="inputCols"),
             inputs={
                 "original_dict": "params:imputing_params",
                 "value": "feature_name_list",
             },
-            outputs="adjusted_imputed_params",
-            name="adjusting_imputed_params",
+            outputs="adjusted_imputed_params_input",
+            name="adjusting_imputed_params_input_cols",
             tags=["imputation", "modeling"],
         ),
         node(
-            func=impute_dataframe,
-            inputs=["train_test_splitted_data", "adjusted_imputed_params"],
+            func=partial(update_dictionary, level_name="transformer", key="outputCols"),
+            inputs={
+                "original_dict": "adjusted_imputed_params_input",
+                "value": "feature_name_list",
+            },
+            outputs="adjusted_imputed_params_output",
+            name="adjusting_imputed_params_output_cols",
+            tags=["imputation", "modeling"],
+        ),
+        node(
+            func=imputer,
+            inputs=["train_test_splitted_data", "adjusted_imputed_params_output"],
             outputs="imputed_data",
             name="imputation",
+            tags=["imputation", "modeling"],
+        ),
+        node(
+            func=vector_assemble,
+            inputs=["imputed_data", "feature_name_list"],
+            outputs="assembled_imputed_data",
+            name="create_vector_assemble",
             tags=["imputation", "modeling"],
         ),
     ]
@@ -63,21 +76,12 @@ imputing_nodes = Pipeline(
 hyperparameter_tuning_node = Pipeline(
     nodes=[
         node(
-            func=partial(update_dictionary, key="featuresCol"),
+            func=tuner,
             inputs={
-                "original_dict": "params:tuning_params.model",
-                "value": "feature_name_list",
-            },
-            outputs="adjusted_tuning_model_params",
-            name="adjusting_tuning_params",
-            tags=["tuning", "modeling"],
-        ),
-        node(
-            func=hp_tuning,
-            inputs={
-                "data": "imputed_data",
-                "model_params": "adjusted_tuning_model_params",
-                "cv_params": "params:tuning_params.cv",
+                "data": "assembled_imputed_data",
+                "tuner": "params:tuning_params.tuning_func",
+                "param_grid": "params:tuning_params.param_grid",
+                "target_col_name": "params:tuning_params.target_col_name",
             },
             outputs="optimal_tuning_params",
             name="hyperparameter_tune",
