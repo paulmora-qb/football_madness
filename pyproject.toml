@@ -13,8 +13,10 @@ known_third_party = "kedro"
 
 [tool.pytest.ini_options]
 addopts = """
+pythonpath = [".", "src"]
 --cov-report term-missing \
 --cov src/new_kedro_project -ra"""
+
 
 [tool.coverage.report]
 fail_under = 0
