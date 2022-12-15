@@ -1,6 +1,6 @@
 """Functions/ Classes for the creation of data dictionary"""
 
-from typing import Dict, List
+from typing import List
 
 from pyspark.sql import DataFrame
 
@@ -18,6 +18,15 @@ class DataDictionary:
                 treated as features
         """
         return [x for x in self.column_names if x.startswith("ftr_")]
+
+    def get_target_column(self) -> str:
+        """This function returns the target column name.
+
+        Returns:
+            str: The name of the target column
+        """
+        a = 1
+        return a
 
 
 def create_data_dictionary(master_table: DataFrame) -> DataDictionary:

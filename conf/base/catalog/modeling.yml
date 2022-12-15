@@ -15,6 +15,10 @@ data_dictionary:
   type: pickle.PickleDataSet
   filepath: ./data/05_model_input/data_dictionary.pkl
 
+feature_name_list:
+  type: pickle.PickleDataSet
+  filepath: ./data/05_model_input/feature_name_list.pkl
+
 target_variable:
   <<: *pq
   filepath: ./data/04_feature/target_variable
@@ -27,10 +31,6 @@ train_test_splitted_data:
   <<: *pq
   filepath: ./data/05_model_input/train_test_splitted_data
 
-feature_name_list:
-  type: pickle.PickleDataSet
-  filepath: ./data/05_model_input/feature_name_list.pkl
-
-assembled_imputed_data:
+imputed_data:
   <<: *pq
   filepath: ./data/05_model_input/imputed_data
