@@ -11,6 +11,14 @@ _pq: &pq
 _pickle: &pickle
   type: pickle.PickleDataSet
 
+fitted_target_variable_encoder:
+  type: MemoryDataSet
+  copy_mode: assign
+
+target_encoder_index_labels:
+  type: pickle.PickleDataSet
+  filepath: ./data/06_models/target_encoder_index_labels.pkl
+
 data_dictionary:
   type: pickle.PickleDataSet
   filepath: ./data/05_model_input/data_dictionary.pkl

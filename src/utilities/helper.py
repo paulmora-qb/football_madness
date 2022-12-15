@@ -3,24 +3,21 @@
 import importlib
 from typing import Any, Callable, Dict, Iterable, List
 
-from pyspark.ml.feature import VectorAssembler
-from pyspark.sql import DataFrame, SparkSession
-
-
-def vector_assemble(data: DataFrame, feature_names: List[str]) -> DataFrame:
-    assembler = VectorAssembler(inputCols=feature_names, outputCol="features")
-    return assembler.transform(data)
+from pyspark.sql import SparkSession
 
 
 def update_dictionary(
-    original_dict: Dict[str, str], level_name: str, key: str, value: Any,
+    original_dict: Dict[str, str], key: str, value: Any, level_name: str = None
 ) -> Dict[str, str]:
 
-    if level_name not in original_dict.keys():
-        raise ValueError(
-            f"Level name: {level_name} does not exist as a key in original dict"
-        )
-    original_dict[level_name][key] = value
+    if level_name:
+        if level_name not in original_dict.keys():
+            raise ValueError(
+                f"Level name: {level_name} does not exist as a key in original dict"
+            )
+        original_dict[level_name][key] = value
+    else:
+        original_dict[key] = value
     return original_dict
 
 

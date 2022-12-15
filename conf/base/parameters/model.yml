@@ -10,10 +10,10 @@ target_variable:
     object: pyspark.ml.feature.StringIndexer
     inputCol: full_time_result
     outputCol: tgt_full_time_result
-  inverted_encoder:
-    object: pyspark.ml.feature.IndexToString
-    inputCol: tgt_full_time_result
-    outputCol: tgt_full_time_result_index
+  # inverted_encoder:
+  #   object: pyspark.ml.feature.IndexToString
+  #   inputCol: tgt_full_time_result
+  #   outputCol: tgt_full_time_result_index
 
 master_table:
   target_df: target_variable

@@ -1,5 +1,7 @@
 """Creating the pipeline for prediticting the results"""
 
+from functools import partial
+
 from kedro.pipeline import Pipeline, node
 
 from general.functions.model_development.master_table.master import (
@@ -8,7 +10,9 @@ from general.functions.model_development.master_table.master import (
 from general.functions.model_development.master_table.target_variable import (
     create_target_variable,
 )
+from general.nodes.preprocessing.transformer import fit, transform
 from general.pipelines.modeling_pipeline import create_modeling_pipeline
+from utilities.helper import update_dictionary
 
 
 def create_master_pipeline() -> Pipeline:
@@ -18,30 +22,35 @@ def create_master_pipeline() -> Pipeline:
             node(
                 func=create_target_variable,
                 inputs=["concatenated_raw_data", "params:target_variable"],
-                outputs="target_variable",
+                outputs="intermediate_target_variable",
                 name="create_target_variable",
                 tags=["master_table"],
             ),
             node(
-                func=fit_transform,
+                func=partial(fit, split_data=False),
                 inputs={
-                    "data": "target_variable",
+                    "data": "intermediate_target_variable",
                     "transformer": "params:target_variable.encoder",
-                    "target_col_name": "params:target_variable.target_column_name",
                 },
-                outputs="encoded_target_variable",
-                name="encoding_target_variable",
+                outputs="fitted_target_variable_encoder",
+                name="fitting_target_variable_encoder",
                 tags=["master_table"],
             ),
             node(
-                func=fit,
+                func=transform,
                 inputs={
-                    "data": "target_variable",
-                    "transformer": "params:target_variable.inverted_encoder",
-                    "target_col_name": "params:target_variable.target_column_name",
+                    "data": "intermediate_target_variable",
+                    "fitted_transformer": "fitted_target_variable_encoder",
                 },
-                outputs="fitted_target_inverter",
-                name="fitting_target_variable_inverter",
+                outputs="target_variable",
+                name="transform_target_variable_encoder",
+                tags=["master_table"],
+            ),
+            node(
+                func=lambda x: x.labels,
+                inputs="fitted_target_variable_encoder",
+                outputs="target_encoder_index_labels",
+                name="extracting_labels_from_target_encoder",
                 tags=["master_table"],
             ),
         ]
