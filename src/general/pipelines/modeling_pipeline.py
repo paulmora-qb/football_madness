@@ -8,9 +8,8 @@ from general.functions.model_development.data_dictionary.data_dictionary import 
     create_data_dictionary,
 )
 from general.functions.modeling.model_splitting import split_train_test_dataframe
-from general.nodes.modeling.model_assembler import assembler
-from general.nodes.modeling.model_imputation import imputer
 from general.nodes.modeling.model_tuning import tuner
+from general.nodes.preprocessing.transformer import fit, transform
 from utilities.helper import update_dictionary
 
 
@@ -51,34 +50,40 @@ def create_modeling_pipeline() -> Pipeline:
     imputing = Pipeline(
         nodes=[
             node(
-                func=partial(
-                    update_dictionary, level_name="transformer", key="inputCols"
-                ),
+                func=partial(update_dictionary, key="inputCols"),
                 inputs={
-                    "original_dict": "params:imputing_params",
+                    "original_dict": "params:imputing_transformer",
                     "value": "feature_name_list",
                 },
-                outputs="adjusted_imputed_params_input",
+                outputs="adjusted_imputing_transformer_input",
                 name="adjusting_imputed_params_input_cols",
                 tags=["imputation", "modeling"],
             ),
             node(
-                func=partial(
-                    update_dictionary, level_name="transformer", key="outputCols"
-                ),
+                func=partial(update_dictionary, key="outputCols"),
                 inputs={
-                    "original_dict": "adjusted_imputed_params_input",
+                    "original_dict": "adjusted_imputing_transformer_input",
                     "value": "feature_name_list",
                 },
-                outputs="adjusted_imputed_params_output",
+                outputs="adjusted_imputing_transformer_output",
                 name="adjusting_imputed_params_output_cols",
                 tags=["imputation", "modeling"],
             ),
             node(
-                func=imputer,
-                inputs=["train_test_splitted_data", "adjusted_imputed_params_output"],
+                func=fit,
+                inputs=[
+                    "train_test_splitted_data",
+                    "adjusted_imputing_transformer_output",
+                ],
+                outputs="fitted_imputer",
+                name="fitting_imputerimputation",
+                tags=["imputation", "modeling"],
+            ),
+            node(
+                func=transform,
+                inputs=["train_test_splitted_data", "fitted_imputer"],
                 outputs="imputed_data",
-                name="imputation",
+                name="imputing_dataset",
                 tags=["imputation", "modeling"],
             ),
         ]
@@ -87,28 +92,21 @@ def create_modeling_pipeline() -> Pipeline:
     assembling = Pipeline(
         nodes=[
             node(
-                func=partial(update_dictionary, level_name="features", key="inputCols"),
+                func=partial(update_dictionary, key="inputCols"),
                 inputs={
                     "original_dict": "params:assembler",
                     "value": "feature_name_list",
                 },
-                outputs="adjusted_assembler_features_params",
-                name="adjusted_assembler_features_params",
+                outputs="adjusted_assembler",
+                name="adjusintg_assembler_configuration",
                 tags=["imputation", "modeling"],
             ),
             node(
-                func=assembler,
-                inputs=["imputed_data", "params:assembler.features",],
-                outputs="feature_columns",
-                name="feature_assembler",
-                tags=["assembler", "modeling"],
-            ),
-            node(
-                func=assembler,
-                inputs=["imputed_data", "params:assembler.target",],
-                outputs="target_column",
-                name="target_assembler",
-                tags=["assembler", "modeling"],
+                func=transform,
+                inputs=["imputed_dataset", "adjusted_assembler"],
+                outputs="assembled_imputed_dataset",
+                name="assembling_features",
+                tags=["assembling", "modeling"],
             ),
         ]
     )

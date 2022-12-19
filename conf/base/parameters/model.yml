@@ -26,19 +26,13 @@ splitting_params:
   train_size: 0.8
   seed: 42
 
-imputing_params:
-  transformer:
-    object: pyspark.ml.feature.Imputer
-    strategy: mean
+imputing_transformer:
+  object: pyspark.ml.feature.Imputer
+  strategy: mean
 
 assembler:
-  features:
-    object: pyspark.ml.feature.VectorAssembler
-    outputCol: features
-  target:
-    object: pyspark.ml.feature.StringIndexer
-    inputCol: full_time_result
-    outputCol: full_time_result_index
+  object: pyspark.ml.feature.VectorAssembler
+  outputCol: features
 
 tuning_params:
   tuning_func:

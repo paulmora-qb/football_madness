@@ -6,7 +6,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
 
 
-def fit(data: DataFrame, transformer: Callable, split_data: bool = True) -> Callable:
+def fit(data: DataFrame, transformer: Callable, split_data: bool = True,) -> Callable:
     """This function fits the transformer on the provided dataframe. We also distinguish
     between only using the train dataset for fitting, or the entire dataset. Using the
     entire dataset is sometimes required, when applying a stringindexer for example.
@@ -18,14 +18,12 @@ def fit(data: DataFrame, transformer: Callable, split_data: bool = True) -> Call
             to fit only on the training data. Defaults to True.
 
     Returns:
-        Callable: _description_
+        Callable: Fitted transformer instance
     """
 
-    if not split_data:
-        model = transformer.fit(data)
-    else:
-        train_data = data.filter(f.col("split") == "TRAIN")
-        model = transformer.fit(train_data)
+    if split_data:
+        data = data.filter(f.col("split") == "TRAIN")
+    model = transformer.fit(data)
 
     return model
 
@@ -45,4 +43,4 @@ def transform(data: DataFrame, fitted_transformer: Callable) -> DataFrame:
 
 
 def fit_transform(data: DataFrame, transformer: Callable) -> DataFrame:
-    return fit(data, transformer, target_col_name).transform(data)
+    return fit(data, transformer).transform(data)
