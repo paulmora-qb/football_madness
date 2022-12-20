@@ -1,10 +1,13 @@
 """Project settings."""
-from football_madness.hooks import ProjectHooks
+from football_madness.hooks import ModelTrackingHooks, ProjectHooks
 
 from .context import SparkContext
 
 # Instantiate and list your project hooks here
-HOOKS = (ProjectHooks(),)
+HOOKS = (
+    ModelTrackingHooks(),
+    ProjectHooks(),
+)
 
 # List the installed plugins for which to disable auto-registry
 # DISABLE_HOOKS_FOR_PLUGINS = ("kedro-viz",)

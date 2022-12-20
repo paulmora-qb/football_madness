@@ -1,4 +1,11 @@
 
+mlflow:
+  enabled: True
+  metrics:
+  artifcats:
+  parameters:
+  tags:
+
 target_variable:
   target_column_name: full_time_result
   keys: 

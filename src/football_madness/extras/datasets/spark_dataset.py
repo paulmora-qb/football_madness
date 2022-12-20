@@ -28,5 +28,5 @@ class SparkMLDataSet(SparkDataSet):
         # model = PipelineModel.load(load_path)
         # from pyspark.ml.util import MLReader, DefaultParamsReadable
 
-        return model
+        # return model
 
