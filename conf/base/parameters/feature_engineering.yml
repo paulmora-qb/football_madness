@@ -2,7 +2,7 @@
 ftr_match_spine:
   keys: ["home_team", "away_team", "date", "league"]
 
-ftr_momentum:
+feature.momentum:
   - function: feature_engineering.functions.aggregation.create_window_aggregates
     partition_by: ["team", "season"]
     order_by: ["datediff"]

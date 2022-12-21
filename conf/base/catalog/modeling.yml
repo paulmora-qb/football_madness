@@ -1,4 +1,8 @@
 
+mlflow:
+  artifacts:
+    - fitted_imputer
+
 _pq: &pq
   type: spark.SparkDataSet
   file_format: parquet

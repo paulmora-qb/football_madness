@@ -1,8 +1,9 @@
 """Project hooks."""
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 import mlflow
 import mlflow.spark
+import pandas as pd
 from kedro.config import ConfigLoader
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
@@ -31,36 +32,76 @@ class ProjectHooks:
         )
 
 
+def recursive_retrieving(dictionary: Dict[str, Any], keys: List[str]) -> Any:
+    """This function is digging into the catalog provided by kedro, by going recursively
+    looping through the delimiters of the parameters. For example if one states that one
+    would like to save `splitting_params.train_size`, then the dictionary is first
+    searched for `splitting_params` and the second term in place is searched for, namely
+    `train_size`. In the end, after the desired value is found, the `keys` input is None
+    and we return the dictionary, which at the end is the value we were looking for
+    """
+    if dictionary is None:
+        return dictionary
+    return (
+        recursive_retrieving(dictionary.get(keys[0], None), keys[1:])
+        if keys
+        else dictionary
+    )
+
+
 class ModelTrackingHooks:
     """Namespace for grouping all model-tracking hooks with MLflow together."""
 
     @hook_impl
-    def before_pipeline_run(self, run_params: Dict[str, Any]) -> None:
+    def before_pipeline_run(
+        self, catalog: DataCatalog, run_params: Dict[str, Any]
+    ) -> None:
         """Hook implementation to start an MLflow run
         with the session_id of the Kedro pipeline run.
         """
-        mlflow.start_run(run_name=run_params["session_id"])
+        mlflow.start_run(run_name=run_params["run_id"])
         mlflow.log_params(run_params)
+
+        from kedro.config import ConfigLoader
+
+        conf_paths = ["conf/base", "conf/local"]
+        conf_loader = ConfigLoader(conf_paths)
+
+        config_mlflow = {}
+        config_mlflow.update()
+
+        # TODO: Write the possiblity of having multiple mlflow configurations
+        # conf_catalog = conf_loader.get("catalog*", "catalog*/**").get("mlflow", {})
+        conf_parameters = conf_loader.get("parameters*", "parameters*/**").get(
+            "mlflow", {}
+        )
+
+        # Saving what we would like to log on the way
+        self.mlflow_savings = {
+            "metrics": conf_parameters.get("metrics", {}),
+            "tags": conf_parameters.get("tags", {}),
+            "artifcats": conf_parameters.get("artifacts", {}),
+        }
+
+        # Logging already what we can at that point
+        all_parameters_dictionary = catalog.load("parameters")
+        for param in conf_parameters.get("parameters", {}):
+            mlflow.log_param(
+                param, recursive_retrieving(all_parameters_dictionary, param.split("."))
+            )
 
     @hook_impl
     def after_node_run(
         self, node: Node, outputs: Dict[str, Any], inputs: Dict[str, Any]
     ) -> None:
-        """Hook implementation to add model tracking after some node runs.
-        In this example, we will:
-        * Log the parameters after the data splitting node runs.
-        * Log the model after the model training node runs.
-        * Log the model's metrics after the model evaluating node runs.
-        """
-        if node._func_name == "split_data":
-            mlflow.log_params(
-                {"split_data_ratio": inputs["params:example_test_data_ratio"]}
-            )
 
-        elif node._func_name == "train_model":
-            model = outputs["example_model"]
-            mlflow.sklearn.log_model(model, "model")
-            mlflow.log_params(inputs["parameters"])
+        input_output_dict = pd.json_normalize(
+            {key: val for key, val in {**inputs, **outputs}.items()}, sep=".",
+        ).to_dict(orient="records")[0]
+
+        self.mlflow_savings["metrics"]
+
+        mlflow.log_params(input_output_dict, self.mlflow_savings["parameters"])
 
     @hook_impl
     def after_pipeline_run(self) -> None:

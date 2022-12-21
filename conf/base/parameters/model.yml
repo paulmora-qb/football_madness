@@ -2,8 +2,10 @@
 mlflow:
   enabled: True
   metrics:
-  artifcats:
   parameters:
+    - splitting_params.train_size
+    - imputing_transformer.strategy
+    - tuning_params.param_grid
   tags:
 
 target_variable:
