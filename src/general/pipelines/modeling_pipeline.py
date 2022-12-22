@@ -8,13 +8,14 @@ from general.functions.model_development.data_dictionary.data_dictionary import 
     create_data_dictionary,
 )
 from general.functions.modeling.model_splitting import split_train_test_dataframe
+from general.nodes.modeling.model_evaluation import prediction_evaluation
 from general.nodes.modeling.model_inference import model_prediction
 from general.nodes.modeling.model_tuning import tuner
 from general.nodes.preprocessing.transformer import fit, transform
 from utilities.helper import update_dictionary
 
 
-def create_modeling_pipeline() -> Pipeline:
+def create_pipeline() -> Pipeline:
     """Create the modeling pipeline
 
     Returns:
@@ -143,6 +144,9 @@ def create_modeling_pipeline() -> Pipeline:
                     "trained_model": "best_fitted_model",
                     "prediction_suffix": "params:model_params.prediction_suffix",
                     "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
+                    "inverter": "params:model_params.index_to_string_encoder",
+                    "labels": "target_encoder_index_labels",
+                    "index_sub_suffix": "params:model_params.index_sub_suffix",
                 },
                 outputs="model_predictions",
                 name="make_model_predictions",
@@ -160,6 +164,9 @@ def create_modeling_pipeline() -> Pipeline:
                     "evaluation_function": "params:performance_evaluation_params.evaluator",
                     "evaluation_metrics": "params:performance_evaluation_params.metrics",
                 },
+                outputs="prediction_evaluation_dict",
+                name="prediction_evaluation",
+                tags=["evaluation", "modeling"],
             )
         ]
     )
@@ -175,3 +182,8 @@ def create_modeling_pipeline() -> Pipeline:
     ]
 
     return Pipeline(modeling_nodes)
+
+
+def create_modeling_pipeline(model_type="classification"):
+    """For adjusting whether we are dealing with a classification or regression case"""
+    return create_pipeline()

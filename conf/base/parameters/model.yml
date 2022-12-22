@@ -18,11 +18,7 @@ target_variable:
   encoder:
     object: pyspark.ml.feature.StringIndexer
     inputCol: full_time_result
-    outputCol: tgt_full_time_result
-  # inverted_encoder:
-  #   object: pyspark.ml.feature.IndexToString
-  #   inputCol: tgt_full_time_result
-  #   outputCol: tgt_full_time_result_index
+    outputCol: tgt_full_time_result_index
 
 master_table:
   target_df: target_variable
@@ -48,15 +44,15 @@ tuning_params:
     object: pyspark.ml.tuning.CrossValidator
     seed: 42
     parallelism: 6
-    numFolds: 5
+    numFolds: 3
     estimator:
       object: pyspark.ml.classification.RandomForestClassifier
-      labelCol: tgt_full_time_result
+      labelCol: tgt_full_time_result_index
       featuresCol: features
     evaluator:
       object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
       predictionCol: prediction
-      labelCol: tgt_full_time_result
+      labelCol: tgt_full_time_result_index
       metricName: f1
   param_grid:
     maxDepth: [5, 10]
@@ -64,11 +60,15 @@ tuning_params:
 model_params:
   prediction_suffix: _pred
   prediction_proba_suffix: _pred_score
+  index_sub_suffix: _index
+  index_to_string_encoder:
+    object: pyspark.ml.feature.IndexToString
+
 
 performance_evaluation_params:
   evaluator:
     object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
-  metrices:
+  metrics:
      - f1
      - weightedPrecision
      - weightedRecall
