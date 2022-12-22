@@ -8,6 +8,7 @@ from general.functions.model_development.data_dictionary.data_dictionary import 
     create_data_dictionary,
 )
 from general.functions.modeling.model_splitting import split_train_test_dataframe
+from general.nodes.modeling.model_inference import model_prediction
 from general.nodes.modeling.model_tuning import tuner
 from general.nodes.preprocessing.transformer import fit, transform
 from utilities.helper import update_dictionary
@@ -71,18 +72,21 @@ def create_modeling_pipeline() -> Pipeline:
             ),
             node(
                 func=fit,
-                inputs=[
-                    "train_test_splitted_data",
-                    "adjusted_imputing_transformer_output",
-                ],
+                inputs={
+                    "data": "train_test_splitted_data",
+                    "transformer": "adjusted_imputing_transformer_output",
+                },
                 outputs="fitted_imputer",
                 name="fitting_imputerimputation",
                 tags=["imputation", "modeling"],
             ),
             node(
                 func=transform,
-                inputs=["train_test_splitted_data", "fitted_imputer"],
-                outputs="imputed_data",
+                inputs={
+                    "data": "train_test_splitted_data",
+                    "transformer": "fitted_imputer",
+                },
+                outputs="imputed_dataset",
                 name="imputing_dataset",
                 tags=["imputation", "modeling"],
             ),
@@ -103,7 +107,10 @@ def create_modeling_pipeline() -> Pipeline:
             ),
             node(
                 func=transform,
-                inputs=["imputed_dataset", "adjusted_assembler"],
+                inputs={
+                    "data": "imputed_dataset",
+                    "transformer": "adjusted_assembler",
+                },
                 outputs="assembled_imputed_dataset",
                 name="assembling_features",
                 tags=["assembling", "modeling"],
@@ -116,15 +123,44 @@ def create_modeling_pipeline() -> Pipeline:
             node(
                 func=tuner,
                 inputs={
-                    "data": "assembled_imputed_data",
+                    "data": "assembled_imputed_dataset",
                     "tuner": "params:tuning_params.tuning_func",
                     "param_grid": "params:tuning_params.param_grid",
-                    "target_col_name": "params:tuning_params.target_col_name",
                 },
-                outputs="optimal_tuning_params",
+                outputs=["best_fitted_model", "optimal_tuning_params"],
                 name="hyperparameter_tune",
                 tags=["tuning", "modeling"],
             ),
+        ]
+    )
+
+    make_model_predictions = Pipeline(
+        nodes=[
+            node(
+                func=model_prediction,
+                inputs={
+                    "data": "assembled_imputed_dataset",
+                    "trained_model": "best_fitted_model",
+                    "prediction_suffix": "params:model_params.prediction_suffix",
+                    "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
+                },
+                outputs="model_predictions",
+                name="make_model_predictions",
+                tags=["predictions", "modeling"],
+            )
+        ]
+    )
+
+    performance_evaluation = Pipeline(
+        nodes=[
+            node(
+                func=prediction_evaluation,
+                inputs={
+                    "data": "model_predictions",
+                    "evaluation_function": "params:performance_evaluation_params.evaluator",
+                    "evaluation_metrics": "params:performance_evaluation_params.metrics",
+                },
+            )
         ]
     )
 
@@ -134,6 +170,8 @@ def create_modeling_pipeline() -> Pipeline:
         imputing,
         assembling,
         hyperparameter_tuning,
+        make_model_predictions,
+        performance_evaluation,
     ]
 
     return Pipeline(modeling_nodes)

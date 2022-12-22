@@ -28,18 +28,18 @@ def fit(data: DataFrame, transformer: Callable, split_data: bool = True,) -> Cal
     return model
 
 
-def transform(data: DataFrame, fitted_transformer: Callable) -> DataFrame:
+def transform(data: DataFrame, transformer: Callable) -> DataFrame:
     """This function applies the fitted transformer and applies it on the dataset
 
     Args:
         data (DataFrame): Dataset on which we apply the transformer
-        fitted_transformer (Callable): Fitted instance of the transformer
+        transformer (Callable): Fitted instance of the transformer
 
     Returns:
         DataFrame: Transformed dataset
     """
 
-    return fitted_transformer.transform(data)
+    return transformer.transform(data)
 
 
 def fit_transform(data: DataFrame, transformer: Callable) -> DataFrame:

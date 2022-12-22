@@ -10,7 +10,7 @@ mlflow:
 
 target_variable:
   target_column_name: full_time_result
-  keys: 
+  keys:
     - home_team
     - away_team
     - date
@@ -51,13 +51,25 @@ tuning_params:
     numFolds: 5
     estimator:
       object: pyspark.ml.classification.RandomForestClassifier
-      labelCol: full_time_result
+      labelCol: tgt_full_time_result
       featuresCol: features
     evaluator:
       object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
       predictionCol: prediction
-      labelCol: full_time_result
+      labelCol: tgt_full_time_result
       metricName: f1
   param_grid:
     maxDepth: [5, 10]
-  target_col_name: full_time_result
+
+model_params:
+  prediction_suffix: _pred
+  prediction_proba_suffix: _pred_score
+
+performance_evaluation_params:
+  evaluator:
+    object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
+  metrices:
+     - f1
+     - weightedPrecision
+     - weightedRecall
+     - accuracy

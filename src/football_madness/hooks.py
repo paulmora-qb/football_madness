@@ -94,14 +94,15 @@ class ModelTrackingHooks:
     def after_node_run(
         self, node: Node, outputs: Dict[str, Any], inputs: Dict[str, Any]
     ) -> None:
+        pass
 
-        input_output_dict = pd.json_normalize(
-            {key: val for key, val in {**inputs, **outputs}.items()}, sep=".",
-        ).to_dict(orient="records")[0]
+        # input_output_dict = pd.json_normalize(
+        #     {key: val for key, val in {**inputs, **outputs}.items()}, sep=".",
+        # ).to_dict(orient="records")[0]
 
-        self.mlflow_savings["metrics"]
+        # self.mlflow_savings["metrics"]
 
-        mlflow.log_params(input_output_dict, self.mlflow_savings["parameters"])
+        # mlflow.log_params(input_output_dict, self.mlflow_savings["parameters"])
 
     @hook_impl
     def after_pipeline_run(self) -> None:

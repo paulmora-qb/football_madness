@@ -1,10 +1,12 @@
 """Fine-tune hyper-parameters for modeling"""
 
-from random import Random
-from typing import Any, Callable, Dict, List
+from re import L
+from typing import Any, Callable, Dict, List, Tuple
 
-from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+import numpy as np
+from pyspark.ml.tuning import ParamGridBuilder
 from pyspark.sql import DataFrame
+from pyspark.sql import functions as f
 
 
 def _get_param_grid_ready(
@@ -28,16 +30,30 @@ def _get_param_grid_ready(
     return param_grid_instance.build()
 
 
-def tuner(
-    data: DataFrame, tuner: Callable, param_grid: Dict[str, str], target_col_name
-) -> Dict[str, str]:
+def tuner(data: DataFrame, tuner: Callable, param_grid: Dict[str, str]):
+    """The tuner function cross-validates the provided model and parameter grid.
+    Afterwards we return the best fitted model and the parameters of the best fitted
+    model
+
+    Args:
+        data (DataFrame): DataFrame to be cross-validated
+        tuner (Callable): Cross-Validation function
+        param_grid (Dict[str, str]): Parameter grid with the string name of the model
+            and a list of values to try 
+
+    Returns:
+        Tuple[Callable, Dict[str, str]]: Fitted model and best parameter set
+    """
 
     param_grid_instance = _get_param_grid_ready(tuner.getEstimator(), param_grid)
     tuner.setParams(estimatorParamMaps=param_grid_instance)
 
-    from pyspark.ml.classification import RandomForestClassifier
+    fitted_tuner = tuner.fit(data.filter(f.col("split") == "TRAIN"))
 
-    RandomForestClassifier().fit(data)
+    best_params = fitted_tuner.getEstimatorParamMaps()[
+        np.argmax(fitted_tuner.avgMetrics)
+    ]
+    best_params = {key.name: value for key, value in best_params.items()}
 
-    tuner.fit(data)
+    return (fitted_tuner.bestModel, best_params)
 
