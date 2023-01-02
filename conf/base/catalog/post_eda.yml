@@ -1,0 +1,9 @@
+
+_plt: &plt
+  type: matplotlib.MatplotlibWriter
+  save_args:
+    format: png
+
+feature_importance_plot:
+  <<: *plt
+  filepath: ./data/08_reporting/feature_importance_plot.png

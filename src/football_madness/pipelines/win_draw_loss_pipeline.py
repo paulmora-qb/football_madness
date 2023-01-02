@@ -73,7 +73,9 @@ def create_pipeline(categorical_target: bool) -> Pipeline:
     return (
         create_master_pipeline()
         + modeling_pipeline.create_modeling_pipeline(
-            categorical_target=categorical_target
+            model_type="classification", categorical_target=categorical_target
         )
-        + post_train_eda_pipeline.create_pipeline(categorical_target=categorical_target)
+        + post_train_eda_pipeline.create_pipeline(
+            model_type="classification", tree_model=True
+        )
     )
