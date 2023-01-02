@@ -19,5 +19,7 @@ def register_pipelines() -> Dict[str, Pipeline]:
     return {
         "preprocessing": create_preprocessing_pipeline(),
         "feature_engineering": create_feature_engineering_pipeline(),
-        "win_draw_loss_prediction": create_win_draw_loss_pipeline(),
+        "win_draw_loss_prediction": create_win_draw_loss_pipeline(
+            categorical_target=True
+        ),
     }

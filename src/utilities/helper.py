@@ -11,11 +11,13 @@ def update_dictionary(
 ) -> Dict[str, str]:
 
     if level_name:
-        if level_name not in original_dict.keys():
-            raise ValueError(
-                f"Level name: {level_name} does not exist as a key in original dict"
-            )
-        original_dict[level_name][key] = value
+        for iter_key in level_name.split("."):
+            if iter_key not in original_dict.keys():
+                raise ValueError("Pathing of the dictionary is not correctly stated")
+            else:
+                original_dict = original_dict[iter_key]
+
+        original_dict[key] = value
     else:
         original_dict[key] = value
     return original_dict

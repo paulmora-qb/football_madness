@@ -5,14 +5,44 @@ from typing import Callable, List
 from pyspark.sql import DataFrame
 
 
+def target_column_inverter(
+    data: DataFrame,
+    inverter: Callable,
+    target_column_name: str,
+    prediction_suffix: str,
+    index_suffix: str,
+) -> DataFrame:
+    """This function inputs a dataframe in which the target variable is currently
+    encoded in a numerical format and we would like to get the inverted shape back
+
+    Args:
+        data (DataFrame): Dataframe containing the target column which has a numerical
+            target variable which we would like to transform
+        inverter (Callable): The inverter function we use to bring the category value
+            back
+        label_col_name (str): Name of the target column which is still in numerical
+            format 
+
+    Returns:
+        DataFrame: Dataframe which now has the inverted target variable back. We also
+            delete the numerical column since we do not need two
+    """
+    a = 1
+    # assert label_column_name.endswith(
+    #     index_sub_suffix
+    # ), "The encoded target variable has the wrong suffix."
+
+    # adjusted_label_column_name = label_column_name.replace(index_sub_suffix, "")
+    # inverter.setInputCol(label_column_name)
+    # inverter.setOutputCol(adjusted_label_column_name)
+    return inverter.transform(data)
+
+
 def model_prediction(
     data: DataFrame,
     trained_model: Callable,
     prediction_suffix: str,
-    prediction_proba_suffix: str,
-    inverter: Callable = None,
-    labels: List[str] = None,
-    index_sub_suffix: str = None,
+    prediction_proba_suffix: str = None,
 ) -> DataFrame:
     """This function creates the prediction and prediction probability column. This is
     done by first adding the input to the model and afterwards transform the datasset.
@@ -29,22 +59,8 @@ def model_prediction(
     """
 
     label_column_name = trained_model.getLabelCol()
-    if inverter:
-        label_column_name += index_sub_suffix
-
     prediction_col_name = label_column_name + prediction_suffix
-    prediction_proba_col_name = label_column_name + prediction_proba_suffix
 
     trained_model.setPredictionCol(prediction_col_name)
-    prediction_data = trained_model.transform(data)
-
-    if inverter:
-        inverter.setLabels(labels)
-
-        for column_name in [label_column_name, prediction_col_name]:
-            inverter.setInputCol(column_name)
-            inverter.setOutputCol(column_name.replace(index_sub_suffix, ""))
-            prediction_data = inverter.transform(prediction_data)
-
-    return prediction_data
+    return trained_model.transform(data)
 

@@ -1,5 +1,6 @@
 """Functions/ Classes for the creation of data dictionary"""
 
+from multiprocessing.sharedctypes import Value
 from typing import List
 
 from pyspark.sql import DataFrame
@@ -20,13 +21,17 @@ class DataDictionary:
         return [x for x in self.column_names if x.startswith("ftr_")]
 
     def get_target_column(self) -> str:
-        """This function returns the target column name.
+        """This function returns the target column name. For now we allow only for one
+        target variable column.
 
         Returns:
             str: The name of the target column
         """
-        a = 1
-        return a
+        tgt_column_name_list = [x for x in self.column_names if x.startswith("tgt_")]
+        if len(tgt_column_name_list) > 1:
+            raise ValueError("There should not be more than one target variable")
+        else:
+            return tgt_column_name_list[0]
 
 
 def create_data_dictionary(master_table: DataFrame) -> DataDictionary:

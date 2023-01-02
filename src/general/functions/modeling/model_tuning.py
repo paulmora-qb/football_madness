@@ -48,7 +48,8 @@ def tuner(data: DataFrame, tuner: Callable, param_grid: Dict[str, str]):
     param_grid_instance = _get_param_grid_ready(tuner.getEstimator(), param_grid)
     tuner.setParams(estimatorParamMaps=param_grid_instance)
 
-    fitted_tuner = tuner.fit(data.filter(f.col("split") == "TRAIN"))
+    train_data = data.filter(f.col("split") == "TRAIN")
+    fitted_tuner = tuner.fit(train_data)
 
     best_params = fitted_tuner.getEstimatorParamMaps()[
         np.argmax(fitted_tuner.avgMetrics)

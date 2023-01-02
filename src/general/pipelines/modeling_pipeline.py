@@ -9,17 +9,24 @@ from general.functions.model_development.data_dictionary.data_dictionary import 
 )
 from general.functions.modeling.model_splitting import split_train_test_dataframe
 from general.nodes.modeling.model_evaluation import prediction_evaluation
-from general.nodes.modeling.model_inference import model_prediction
+from general.nodes.modeling.model_inference import (
+    model_prediction,
+    target_column_inverter,
+)
 from general.nodes.modeling.model_tuning import tuner
 from general.nodes.preprocessing.transformer import fit, transform
 from utilities.helper import update_dictionary
 
 
-def create_pipeline() -> Pipeline:
-    """Create the modeling pipeline
+def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
+    """_summary_
+
+    Args:
+        model_type (_type_): _description_
+        categorical_target (_type_): _description_
 
     Returns:
-        Pipeline: Modeling pipeline
+        Pipeline: _description_
     """
 
     data_dictionary = Pipeline(
@@ -43,7 +50,7 @@ def create_pipeline() -> Pipeline:
 
     splitting_train_test = node(
         func=split_train_test_dataframe,
-        inputs=["master_table", "params:splitting_params"],
+        inputs={"data": "master_table", "splitting_params": "params:splitting_params",},
         outputs="train_test_splitted_data",
         name="create_train_test_split",
         tags=["modeling"],
@@ -145,11 +152,28 @@ def create_pipeline() -> Pipeline:
                     "prediction_suffix": "params:model_params.prediction_suffix",
                     "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
                     "inverter": "params:model_params.index_to_string_encoder",
-                    "labels": "target_encoder_index_labels",
                     "index_sub_suffix": "params:model_params.index_sub_suffix",
                 },
                 outputs="model_predictions",
                 name="make_model_predictions",
+                tags=["predictions", "modeling"],
+            )
+        ]
+    )
+
+    invert_numerical_target_to_category = Pipeline(
+        nodes=[
+            node(
+                func=target_column_inverter,
+                inputs={
+                    "data": "model_predictions",
+                    "inverter": "params:inverter_params.index_to_string_encoder",
+                    "target_column_name": "params:target_variable.encoder.outputCol",
+                    "prediction_suffix": "params:model_params.prediction_suffix",
+                    "index_suffix": "params:inverter_params.index_sub_suffix",
+                },
+                outputs="inverted_model_predictions",
+                name="inverting_model_predictions",
                 tags=["predictions", "modeling"],
             )
         ]
@@ -181,9 +205,14 @@ def create_pipeline() -> Pipeline:
         performance_evaluation,
     ]
 
+    if categorical_target:
+        modeling_nodes += [invert_numerical_target_to_category]
+
     return Pipeline(modeling_nodes)
 
 
-def create_modeling_pipeline(model_type="classification"):
+def create_modeling_pipeline(
+    model_type: str = "classification", categorical_target: str = False
+):
     """For adjusting whether we are dealing with a classification or regression case"""
-    return create_pipeline()
+    return create_pipeline(model_type=model_type, categorical_target=categorical_target)

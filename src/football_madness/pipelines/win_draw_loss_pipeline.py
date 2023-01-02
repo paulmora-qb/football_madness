@@ -40,7 +40,7 @@ def create_master_pipeline() -> Pipeline:
                 func=transform,
                 inputs={
                     "data": "intermediate_target_variable",
-                    "fitted_transformer": "fitted_target_variable_encoder",
+                    "transformer": "fitted_target_variable_encoder",
                 },
                 outputs="target_variable",
                 name="transform_target_variable_encoder",
@@ -69,5 +69,7 @@ def create_master_pipeline() -> Pipeline:
     return Pipeline(nodes)
 
 
-def create_pipeline() -> Pipeline:
-    return create_master_pipeline() + create_modeling_pipeline()
+def create_pipeline(categorical_target: bool) -> Pipeline:
+    return create_master_pipeline() + create_modeling_pipeline(
+        categorical_target=categorical_target
+    )

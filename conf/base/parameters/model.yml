@@ -26,8 +26,7 @@ master_table:
     - ftr_momentum
 
 splitting_params:
-  target_column_name: full_time_result
-  unique_target_category_values: ["H", "D", "A"]
+  target_column_name: tgt_full_time_result_index
   train_size: 0.8
   seed: 42
 
@@ -60,9 +59,12 @@ tuning_params:
 model_params:
   prediction_suffix: _pred
   prediction_proba_suffix: _pred_score
-  index_sub_suffix: _index
+
+inverter_params:
   index_to_string_encoder:
     object: pyspark.ml.feature.IndexToString
+  prediction_suffix: _pred
+  index_sub_suffix: _index
 
 
 performance_evaluation_params:

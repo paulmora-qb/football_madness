@@ -8,9 +8,6 @@ _pq: &pq
   load_args:
     partitionBy: league
 
-_spark_ml: &spark_ml
-  type: football_madness.extras.datasets.spark_dataset.SparkMLDataSet
-
 _pickle: &pickle
   type: pickle.PickleDataSet
 
@@ -30,6 +27,10 @@ feature_name_list:
   <<: *pickle
   filepath: ./data/05_model_input/feature_name_list.pkl
 
+target_column_name:
+  <<: *pickle
+  filepath: ./data/05_model_input/target_column_name.pkl
+
 target_variable:
   <<: *pq
   filepath: ./data/04_feature/target_variable
@@ -45,8 +46,6 @@ train_test_splitted_data:
 fitted_imputer:
   type: MemoryDataSet
   copy_mode: assign
-  # <<: *spark_ml
-  # filepath: ./data/06_models/fitted_imputer
 
 imputed_data:
   <<: *pq
