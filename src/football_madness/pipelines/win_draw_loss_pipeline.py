@@ -11,7 +11,7 @@ from general.functions.model_development.master_table.target_variable import (
     create_target_variable,
 )
 from general.nodes.preprocessing.transformer import fit, transform
-from general.pipelines.modeling_pipeline import create_modeling_pipeline
+from general.pipelines import modeling_pipeline, post_train_eda_pipeline
 from utilities.helper import update_dictionary
 
 
@@ -70,6 +70,10 @@ def create_master_pipeline() -> Pipeline:
 
 
 def create_pipeline(categorical_target: bool) -> Pipeline:
-    return create_master_pipeline() + create_modeling_pipeline(
-        categorical_target=categorical_target
+    return (
+        create_master_pipeline()
+        + modeling_pipeline.create_modeling_pipeline(
+            categorical_target=categorical_target
+        )
+        + post_train_eda_pipeline.create_pipeline(categorical_target=categorical_target)
     )

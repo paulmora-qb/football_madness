@@ -151,8 +151,6 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                     "trained_model": "best_fitted_model",
                     "prediction_suffix": "params:model_params.prediction_suffix",
                     "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
-                    "inverter": "params:model_params.index_to_string_encoder",
-                    "index_sub_suffix": "params:model_params.index_sub_suffix",
                 },
                 outputs="model_predictions",
                 name="make_model_predictions",
@@ -164,18 +162,28 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
     invert_numerical_target_to_category = Pipeline(
         nodes=[
             node(
+                func=partial(update_dictionary, key="labels"),
+                inputs={
+                    "original_dict": "params:inverter_params.index_to_string_encoder",
+                    "value": "target_encoder_index_labels",
+                },
+                outputs="adj_index_to_string_encoder",
+                name="adj_index_to_string_encoding",
+                tags=["inverting", "modeling"],
+            ),
+            node(
                 func=target_column_inverter,
                 inputs={
                     "data": "model_predictions",
-                    "inverter": "params:inverter_params.index_to_string_encoder",
+                    "inverter": "adj_index_to_string_encoder",
                     "target_column_name": "params:target_variable.encoder.outputCol",
                     "prediction_suffix": "params:model_params.prediction_suffix",
                     "index_suffix": "params:inverter_params.index_sub_suffix",
                 },
                 outputs="inverted_model_predictions",
                 name="inverting_model_predictions",
-                tags=["predictions", "modeling"],
-            )
+                tags=["inverting", "modeling"],
+            ),
         ]
     )
 
@@ -184,7 +192,11 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
             node(
                 func=prediction_evaluation,
                 inputs={
-                    "data": "model_predictions",
+                    "data": (
+                        "inverted_model_predictions"
+                        if categorical_target
+                        else "model_predictions"
+                    ),
                     "evaluation_function": "params:performance_evaluation_params.evaluator",
                     "evaluation_metrics": "params:performance_evaluation_params.metrics",
                 },

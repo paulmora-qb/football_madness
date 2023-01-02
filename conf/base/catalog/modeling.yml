@@ -58,3 +58,11 @@ best_fitted_model:
 model_predictions:
   <<: *pq
   filepath: ./data/07_model_output/model_predictions
+
+inverted_model_predictions:
+  <<: *pq
+  filepath: ./data/07_model_output/inverted_model_predictions
+
+prediction_evaluation_dict:
+  <<: *pickle
+  filepath: ./data/08_reporting/model_evaluation

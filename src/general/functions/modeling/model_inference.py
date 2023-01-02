@@ -12,30 +12,33 @@ def target_column_inverter(
     prediction_suffix: str,
     index_suffix: str,
 ) -> DataFrame:
-    """This function inputs a dataframe in which the target variable is currently
-    encoded in a numerical format and we would like to get the inverted shape back
+    """This function reverts the encoded target variable. That is necessary because in
+    Pyspark it is currently not possible to use a categorical target for a
+    classification model. Therefore we encode that variable right at the beginning of
+    the pipeline. At this point we then have to transfer that back, inverting the
+    encoding.
 
     Args:
-        data (DataFrame): Dataframe containing the target column which has a numerical
-            target variable which we would like to transform
-        inverter (Callable): The inverter function we use to bring the category value
-            back
-        label_col_name (str): Name of the target column which is still in numerical
-            format 
+        data (DataFrame): Dataframe containing the encoded target column
+        inverter (Callable): Inverter instance
+        target_column_name (str): Target column name
+        prediction_suffix (str): Suffix added for the prediction column
+        index_suffix (str): Index suffix which was used to distinguish the encoded
+            target from the real one
 
     Returns:
-        DataFrame: Dataframe which now has the inverted target variable back. We also
-            delete the numerical column since we do not need two
+        DataFrame: Dataframe with the inverted target
     """
-    a = 1
-    # assert label_column_name.endswith(
-    #     index_sub_suffix
-    # ), "The encoded target variable has the wrong suffix."
 
-    # adjusted_label_column_name = label_column_name.replace(index_sub_suffix, "")
-    # inverter.setInputCol(label_column_name)
-    # inverter.setOutputCol(adjusted_label_column_name)
-    return inverter.transform(data)
+    target_pred_column_name = target_column_name + prediction_suffix
+    for col_name in [target_column_name, target_pred_column_name]:
+        adjusted_col_name = col_name.replace(index_suffix, "")
+        inverter.setInputCol(col_name)
+        inverter.setOutputCol(adjusted_col_name)
+
+        data = inverter.transform(data)
+
+    return data
 
 
 def model_prediction(

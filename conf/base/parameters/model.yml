@@ -70,6 +70,8 @@ inverter_params:
 performance_evaluation_params:
   evaluator:
     object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
+    predictionCol: tgt_full_time_result_index_pred
+    labelCol: tgt_full_time_result_index
   metrics:
      - f1
      - weightedPrecision
