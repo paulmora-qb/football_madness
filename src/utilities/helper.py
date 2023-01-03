@@ -1,9 +1,25 @@
 """General helper functions"""
 
 import importlib
+import re
 from typing import Any, Callable, Dict, Iterable, List
 
 from pyspark.sql import SparkSession
+
+
+def sentence_case(string: str) -> str:
+    """Function to convert the camel case into a sentence case
+
+    Args:
+        string (str): String in camel case format
+
+    Returns:
+        str: String in sentence case format
+    """
+    if string != "":
+        result = re.sub("([A-Z])", r" \1", string)
+        return result[:1].upper() + result[1:].lower()
+    return
 
 
 def update_dictionary(

@@ -3,6 +3,11 @@ _plt: &plt
   type: matplotlib.MatplotlibWriter
   save_args:
     format: png
+    bbox_inches: tight
+
+performance_metrics_plot:
+  <<: *plt
+  filepath: ./data/08_reporting/performance_metric_plot.png
 
 feature_importance_plot:
   <<: *plt

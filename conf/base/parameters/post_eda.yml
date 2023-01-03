@@ -1,0 +1,15 @@
+
+performance_metrics_plot:
+  x: metric
+  y: performance
+  hue: split
+  xlabel: Metric Name
+  ylabel: Performance Value
+  legend_title: Data Split
+
+feature_importance_plot:
+  x: feature_column_name
+  y: feautre_importance
+  xlabel: Feature Names
+  ylabel: Normalized Feature Importance
+  limit_bars: 20
