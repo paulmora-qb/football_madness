@@ -9,7 +9,18 @@ performance_metrics_plot:
 
 feature_importance_plot:
   x: feature_column_name
-  y: feautre_importance
+  y: feature_importance
   xlabel: Feature Names
   ylabel: Normalized Feature Importance
   limit_bars: 20
+
+confusion_matrix_preparation:
+  prediction_column_name: tgt_full_time_result_pred
+  target_column_name: full_time_result
+  scaled: True
+
+confusion_matrix_plot:
+  vmin: 0
+  vmax: 1
+  xlabel: True Value
+  ylabel: Prediction Value

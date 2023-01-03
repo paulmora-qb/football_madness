@@ -15,7 +15,7 @@ def plot_barplot(
     hue: str = None,
     limit_bars: int = None,
     figsize: Tuple[int] = (16, 9),
-    palette: str = "pastel",
+    palette: str = "Blues_r",
     rotation: int = 45,
     xlabel: str = "X Axis",
     ylabel: str = "Y Axis",
@@ -60,7 +60,5 @@ def plot_barplot(
     # Axis names adjustment
     axs.set_xlabel(xlabel, fontsize=label_fontsize)
     axs.set_ylabel(ylabel, fontsize=label_fontsize)
-
-    fig.savefig("./data.png")
 
     return fig

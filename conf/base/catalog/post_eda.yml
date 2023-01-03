@@ -12,3 +12,7 @@ performance_metrics_plot:
 feature_importance_plot:
   <<: *plt
   filepath: ./data/08_reporting/feature_importance_plot.png
+
+confusion_matrix_heatmap_plot:
+  <<: *plt
+  filepath: ./data/08_reporting/confusion_matrix_plot.png
