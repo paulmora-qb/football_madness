@@ -3,7 +3,7 @@ ftr_match_spine:
   keys: ["home_team", "away_team", "date", "league"]
 
 feature.momentum:
-  - function: feature_engineering.functions.aggregation.create_window_aggregates
+  - object: general.functions.feature_engineering.aggregation.create_window_aggregates
     partition_by: ["team", "season"]
     order_by: ["datediff"]
     aggregation_columns:
@@ -15,17 +15,17 @@ feature.momentum:
     rows_between: [-3, -1]
     prefix: ftr_window
     suffix: last_games
-  # - function: feature_engineering.core.aggregation.create_window_aggregates
-  #   partition_by: ["team"]
-  #   order_by: ["datediff"]
-  #   aggregation_columns:
-  #     - yellows
-  #     - reds
-  #   aggregation_type: pyspark.sql.functions.sum
-  #   rows_between: [-1, -1]
-  #   prefix: lag
-  #   suffix: previous_game
-  # - function: feature_engineering.core.aggregation.create_last_season_indicator
+  - object: general.functions.feature_engineering.aggregation.create_window_aggregates
+    partition_by: ["team"]
+    order_by: ["datediff"]
+    aggregation_columns:
+      - yellows
+      - reds
+    aggregation_type: pyspark.sql.functions.sum
+    rows_between: [-1, -1]
+    prefix: ftr_window
+    suffix: last_games
+  # - object: feature_engineering.core.aggregation.create_last_season_indicator
   #   partition_by: ["team"]
   #   order_by: ["date"]
   #   aggregation_columns:
