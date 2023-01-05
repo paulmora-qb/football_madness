@@ -7,12 +7,14 @@ from pyspark.sql import DataFrame
 from general.nodes.feature_engineering.create_columns import create_column_from_config
 
 
-def create_momentum_features(team_spine, momentum_feature_params) -> DataFrame:
+def create_momentum_features(team_spine, params) -> DataFrame:
 
     core_columns = ["team", "date", "league", "home_away_indication"]
 
+    from pyspark.sql import functions as f
+
     df = team_spine.transform(
-        lambda x: create_column_from_config(x, momentum_feature_params)
+        lambda x: create_column_from_config(x, params["column_aggregation"])
     )
 
     # for param in momentum_feature_params:

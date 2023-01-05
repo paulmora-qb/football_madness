@@ -1,7 +1,7 @@
 """Augmentation of parameters"""
 
+import builtins
 import importlib
-from turtle import update
 from typing import Callable, Tuple
 
 OBJECT_KW = "object"
@@ -9,13 +9,19 @@ OBJECT_KW = "object"
 
 def _load_obj(object_path: str) -> Callable:
 
-    object_path, object_name = object_path.rsplit(".", 1)
-    module_object = importlib.import_module(object_path)
+    if "." in object_path:
+        object_path, object_name = object_path.rsplit(".", 1)
+        module_object = importlib.import_module(object_path)
 
-    if not hasattr(module_object, object_name):
-        raise AttributeError(
-            f"The object {object_path} does not have function {object_name}"
-        )
+        if not hasattr(module_object, object_name):
+            raise AttributeError(
+                f"The object {object_path} does not have function {object_name}"
+            )
+    else:
+        # We then assume that this is a python inbuilt
+        object_name = object_path
+        module_object = builtins
+
     return getattr(module_object, object_name)
 
 
@@ -35,7 +41,17 @@ def _initiate_object(param):
         else:
             new_param_dict[key] = _parse_for_objects(value)
 
-    return _load_obj(object_path)(**new_param_dict)
+    obj = _load_obj(object_path)
+    instantiate = new_param_dict.pop("instantiate_bool", None)
+
+    # Some of the functions should not filled with arguments already as the happens
+    # in the scripts
+    if new_param_dict or instantiate:
+        instantiated_object = obj(**new_param_dict)
+    else:
+        instantiated_object = obj
+
+    return instantiated_object
 
 
 def _parse_for_objects(param):

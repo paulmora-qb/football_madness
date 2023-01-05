@@ -3,28 +3,89 @@ ftr_match_spine:
   keys: ["home_team", "away_team", "date", "league"]
 
 feature.momentum:
-  - object: general.functions.feature_engineering.aggregation.create_window_aggregates
-    partition_by: ["team", "season"]
-    order_by: ["datediff"]
-    aggregation_columns:
-      - full_time_goals
-      - shots_target
-      - full_time_opponent_goals
-      - opponent_shots_target
-    aggregation_type: pyspark.sql.functions.avg
-    rows_between: [-3, -1]
-    prefix: ftr_window
-    suffix: last_games
-  - object: general.functions.feature_engineering.aggregation.create_window_aggregates
-    partition_by: ["team"]
-    order_by: ["datediff"]
-    aggregation_columns:
-      - yellows
-      - reds
-    aggregation_type: pyspark.sql.functions.sum
-    rows_between: [-1, -1]
-    prefix: ftr_window
-    suffix: last_games
+  column_aggregation:
+    - object: general.functions.feature_engineering.aggregation.column_aggregation
+      aggregation_columns:
+        - bet365_odds
+        - gamebookers_odds
+        - interwetten_odds
+        - ladbrokes_odds
+        - sportingbet_odds
+        - williamhill_odds
+        - stanleybet_odds
+        - sporting_odds
+        - betwin_odds
+        - stanjames_odds
+        - vc_odds
+        - bluesquare_odds
+        - pinnacle_odds
+      functions:
+        - object: general.functions.feature_engineering.utils.aggregation.averaging
+      prefix: ftr_agg_winning
+      suffix: odds
+    - object: general.functions.feature_engineering.aggregation.column_aggregation
+      aggregation_columns:
+        - bet365_draw_odds
+        - gamebookers_draw_odds
+        - interwetten_draw_odds
+        - ladbrokes_draw_odds
+        - sportingbet_draw_odds
+        - williamhill_draw_odds
+        - stanleybet_draw_odds
+        - sporting_draw_odds
+        - betwin_draw_odds
+        - stanjames_draw_odds
+        - vc_draw_odds
+        - bluesquare_draw_odds
+        - pinnacle_draw_odds
+      functions:
+        - object: general.functions.feature_engineering.utils.aggregation.averaging
+      prefix: ftr_agg_draw
+      suffix: odds
+    - object: general.functions.feature_engineering.aggregation.column_aggregation
+      aggregation_columns:
+        - bet365_opponent_odds
+        - gamebookers_opponent_odds
+        - interwetten_opponent_odds
+        - ladbrokes_opponent_odds
+        - sportingbet_opponent_odds
+        - williamhill_opponent_odds
+        - stanleybet_opponent_odds
+        - sporting_opponent_odds
+        - betwin_opponent_odds
+        - stanjames_opponent_odds
+        - vc_opponent_odds
+        - bluesquare_opponent_odds
+        - pinnacle_opponent_odds
+      functions:
+        - object: general.functions.feature_engineering.utils.aggregation.averaging
+      prefix: ftr_agg_opponent
+      suffix: odds
+  window_operations:
+    - object: general.functions.feature_engineering.aggregation.create_window_aggregates
+      partition_by: ["team"]
+      order_by: ["datediff"]
+      aggregation_columns:
+        - ftr_agg_winning_avg_odds
+        - ftr_agg_draw_avg_odds
+        - ftr_agg_opponent_avg_odds
+      aggregation_type: pyspark.sql.functions.avg
+      rows_between: [-30, -1]
+      prefix: ftr_window
+      suffix: last_games
+  #   - object: general.functions.feature_engineering.aggregation.create_window_aggregates
+  #     partition_by: ["team", "season"]
+  #     order_by: ["datediff"]
+  #     aggregation_columns:
+  #       - full_time_goals
+  #       - shots_target
+  #       - full_time_opponent_goals
+  #       - opponent_shots_target
+  #     aggregation_type:
+  #       - object: pyspark.sql.functions.avg
+  #     rows_between: [-3, -1]
+  #     prefix: ftr_window
+  #     suffix: last_games
   # - object: feature_engineering.core.aggregation.create_last_season_indicator
   #   partition_by: ["team"]
   #   order_by: ["date"]

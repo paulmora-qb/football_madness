@@ -1,12 +1,40 @@
 """Function with create window aggregations"""
 
-from typing import List
+from typing import Callable, List
 
-from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
 from pyspark.sql.window import Window
 
 from utilities.helper import load_obj
+
+
+def column_aggregation(
+    aggregation_columns: List[str],
+    functions: List[Callable],
+    prefix: str = None,
+    suffix: str = None,
+) -> List[f.col]:
+    """This function aggregates columns. This is done by looping over the functions
+    provided in the configuration file.
+
+    Args:
+        aggregation_columns (List[str]): List of columns that should be aggregated
+        functions (List[Callable]): Functions that should be applied on the aggregate
+        prefix (str, optional): Prefix of the column name. Defaults to None.
+        suffix (str, optional): Suffix of the column name. Defaults to None.
+
+    Returns:
+        List[f.col]: List of columns to be added
+    """
+
+    aggregation_column_list = []
+
+    for function in functions:
+        column_name = f"{prefix}_{function.__name__}_{suffix}"
+        pyspark_columns = [f.col(x) for x in aggregation_columns]
+        aggregation_column_list.append(function(pyspark_columns).alias(column_name))
+
+    return aggregation_column_list
 
 
 def create_last_season_indicator():
