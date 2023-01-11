@@ -3,7 +3,7 @@
 
 from kedro.pipeline import Pipeline, node
 
-from general.functions.feature_engineering.momentum import create_momentum_features
+from feature_engineering.momentum import create_momentum_features
 from general.functions.feature_engineering.spine import (
     create_match_spine,
     create_team_spine,
