@@ -33,16 +33,12 @@ def create_pipeline() -> Pipeline:
         tags=["feature_engineering"],
     )
 
-    momentum_features_node = Pipeline(
-        nodes=[
-            node(
-                func=create_momentum_features,
-                inputs=["team_spine", "params:feature.momentum"],
-                outputs="ftr_momentum",
-                name="create_momentum_features",
-                tags=["feature_engineering"],
-            )
-        ]
+    momentum_features_node = node(
+        func=create_momentum_features,
+        inputs=["team_spine", "params:feature.momentum"],
+        outputs="ftr_momentum",
+        name="create_momentum_features",
+        tags=["feature_engineering"],
     )
 
     feature_engineering_nodes = [

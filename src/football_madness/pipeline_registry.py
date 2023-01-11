@@ -3,7 +3,7 @@ from typing import Dict
 
 from kedro.pipeline import Pipeline
 
-from feature_engineering.feature_engineering_pipeline import (
+from feature_engineering.pipeline import (
     create_pipeline as create_feature_engineering_pipeline,
 )
 from football_madness.pipelines.win_draw_loss_pipeline import (
