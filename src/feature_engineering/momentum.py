@@ -11,6 +11,9 @@ def create_momentum_features(team_spine, params) -> DataFrame:
 
     core_columns = ["team", "date", "league", "home_away_indication"]
 
+    # Replace the indication whether a team or lost with the information of points
+    translation_dict = {"win": 3, "draw": 1, "loss": 0}
+
     df = team_spine.transform(
         lambda x: create_column_from_config(x, params["horizontal_averages"])
     ).transform(lambda x: create_column_from_config(x, params["window_operations"]))
