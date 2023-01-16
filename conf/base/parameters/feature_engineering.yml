@@ -3,6 +3,14 @@ ftr_match_spine:
 
 feature:
   momentum:
+    translation:
+      - object: general.functions.feature_engineering.utils.transforming.dict_replace
+        input_col: full_time_result
+        dictionary:
+          win: 3
+          draw: 1
+          loss: 0
+        column_name: points_per_game
     horizontal_averages:
       - object: general.functions.feature_engineering.aggregation.create_horizontal_averages
         aggregation_columns:
@@ -57,12 +65,12 @@ feature:
         partition_by: ["team"]
         order_by: ["datediff"]
         aggregation_columns:
-          - ftr_betting_odds_winning
-          - ftr_betting_odds_drawing
-          - ftr_betting_odds_losing
+          - betting_odds_winning
+          - betting_odds_drawing
+          - betting_odds_losing
           - full_time_goals
           - full_time_opponent_goals
-          - points_from_game
+          - points_per_game
         aggregation_type: pyspark.sql.functions.avg
         rows_between: [-30, -1]
         prefix: ftr_window
