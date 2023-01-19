@@ -11,7 +11,11 @@ from general.functions.model_development.master_table.target_variable import (
     create_target_variable,
 )
 from general.nodes.preprocessing.transformer import fit, transform
-from general.pipelines import modeling_pipeline, post_train_eda_pipeline
+from general.pipelines import (
+    inference_pipeline,
+    modeling_pipeline,
+    post_train_eda_pipeline,
+)
 from utilities.helper import update_dictionary
 
 
@@ -75,6 +79,7 @@ def create_pipeline(categorical_target: bool) -> Pipeline:
         + modeling_pipeline.create_modeling_pipeline(
             model_type="classification", categorical_target=categorical_target
         )
+        + inference_pipeline.create_pipeline()
         + post_train_eda_pipeline.create_pipeline(
             model_type="classification",
             tree_model=True,
