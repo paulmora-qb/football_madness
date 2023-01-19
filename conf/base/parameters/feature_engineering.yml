@@ -1,5 +1,5 @@
 ftr_match_spine:
-  keys: ["home_team", "away_team", "date", "league"]
+  keys: ["home_team", "away_team", "date", "season", "league"]
 
 feature:
   momentum:
