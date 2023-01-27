@@ -1,4 +1,3 @@
-
 mlflow:
   enabled: True
   metrics:
@@ -18,7 +17,7 @@ target_variable:
   encoder:
     object: pyspark.ml.feature.StringIndexer
     inputCol: full_time_result
-    outputCol: tgt_full_time_result_index
+    outputCol: &target_variable tgt_full_time_result_index
 
 master_table:
   target_df: target_variable
@@ -26,7 +25,7 @@ master_table:
     - ftr_momentum
 
 splitting_params:
-  target_column_name: tgt_full_time_result_index
+  target_column_name: *target_variable
   train_size: 0.8
   seed: 42
 
@@ -46,12 +45,12 @@ tuning_params:
     numFolds: 3
     estimator:
       object: pyspark.ml.classification.RandomForestClassifier
-      labelCol: tgt_full_time_result_index
+      labelCol: *target_variable
       featuresCol: features
     evaluator:
       object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
       predictionCol: prediction
-      labelCol: tgt_full_time_result_index
+      labelCol: *target_variable
       metricName: f1
   param_grid:
     maxDepth: [10]
@@ -66,14 +65,13 @@ inverter_params:
   prediction_suffix: _pred
   index_sub_suffix: _index
 
-
 performance_evaluation_params:
   evaluator:
     object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
     predictionCol: tgt_full_time_result_index_pred
-    labelCol: tgt_full_time_result_index
+    labelCol: *target_variable
   metrics:
-     - f1
-     - weightedPrecision
-     - weightedRecall
-     - accuracy
+    - f1
+    - weightedPrecision
+    - weightedRecall
+    - accuracy
