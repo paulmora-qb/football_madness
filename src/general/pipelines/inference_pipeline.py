@@ -22,6 +22,7 @@ filter_dataframe_node = Pipeline(
     ]
 )
 
+
 apply_imputer = Pipeline(
     nodes=[
         node(
@@ -34,18 +35,35 @@ apply_imputer = Pipeline(
     ]
 )
 
-model_prediction = Pipeline(
+
+assembling = Pipeline(
+    nodes=[
+        node(
+            func=transform,
+            inputs={
+                "data": "imputed_dataset_inference",
+                "transformer": "adjusted_assembler",
+            },
+            outputs="assembled_imputed_dataset_inference",
+            name="assembling_features_inference",
+        ),
+    ],
+    tags=["assembling", "inference"],
+)
+
+
+make_model_predictions = Pipeline(
     nodes=[
         node(
             func=model_prediction,
             inputs={
-                "data": "imputed_dataset_inference",
+                "data": "assembled_imputed_dataset_inference",
                 "trained_model": "prediction_model",
                 "prediction_suffix": "params:model_params.prediction_suffix",
                 "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
             },
-            outputs="model_predictions",
-            name="make_model_predictions",
+            outputs="model_predictions_inference",
+            name="model_predictions_inference",
             tags=["predictions", "inference"],
         )
     ]
@@ -54,6 +72,6 @@ model_prediction = Pipeline(
 
 def create_pipeline():
 
-    nodes = [filter_dataframe_node, apply_imputer]
+    nodes = [filter_dataframe_node, apply_imputer, assembling, make_model_predictions]
 
     return Pipeline(nodes, tags=["inference"])
