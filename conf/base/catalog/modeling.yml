@@ -47,9 +47,9 @@ fitted_imputer:
   type: MemoryDataSet
   copy_mode: assign
 
-imputed_data:
+imputed_dataset:
   <<: *pq
-  filepath: ./data/05_model_input/imputed_data
+  filepath: ./data/05_model_input/imputed_dataset
 
 best_fitted_model:
   type: MemoryDataSet
@@ -66,3 +66,11 @@ inverted_model_predictions:
 prediction_evaluation_dict:
   <<: *pickle
   filepath: ./data/08_reporting/model_evaluation
+
+master_table_inference:
+  <<: *pq
+  filepath: ./data/05_model_input/master_table_inference
+
+imputed_dataset_inference:
+  <<: *pq
+  filepath: ./data/05_model_input/imputed_dataset_inference
