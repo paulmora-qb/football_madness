@@ -36,16 +36,15 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 inputs="master_table",
                 outputs="data_dictionary",
                 name="create_data_dictionary",
-                tags=["data_dictionary", "modeling"],
             ),
             node(
                 func=lambda x: x.get_feature_columns(),
                 inputs="data_dictionary",
                 outputs="feature_name_list",
                 name="feature_name_list",
-                tags=["data_dictionary", "modeling"],
             ),
-        ]
+        ],
+        tags=["data_dictionary", "modeling"],
     )
 
     splitting_train_test = node(
@@ -66,7 +65,6 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="adjusted_imputing_transformer_input",
                 name="adjusting_imputed_params_input_cols",
-                tags=["imputation", "modeling"],
             ),
             node(
                 func=partial(update_dictionary, key="outputCols"),
@@ -76,7 +74,6 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="adjusted_imputing_transformer_output",
                 name="adjusting_imputed_params_output_cols",
-                tags=["imputation", "modeling"],
             ),
             node(
                 func=fit,
@@ -86,7 +83,6 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="fitted_imputer",
                 name="fitting_imputerimputation",
-                tags=["imputation", "modeling"],
             ),
             node(
                 func=transform,
@@ -96,9 +92,9 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="imputed_dataset",
                 name="imputing_dataset",
-                tags=["imputation", "modeling"],
             ),
-        ]
+        ],
+        tags=["imputation", "modeling"],
     )
 
     assembling = Pipeline(
@@ -111,7 +107,6 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="adjusted_assembler",
                 name="adjusintg_assembler_configuration",
-                tags=["imputation", "modeling"],
             ),
             node(
                 func=transform,
@@ -121,9 +116,9 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="assembled_imputed_dataset",
                 name="assembling_features",
-                tags=["assembling", "modeling"],
             ),
-        ]
+        ],
+        tags=["assembling", "modeling"],
     )
 
     hyperparameter_tuning = Pipeline(
@@ -137,9 +132,9 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs=["best_fitted_model", "optimal_tuning_params"],
                 name="hyperparameter_tune",
-                tags=["tuning", "modeling"],
             ),
-        ]
+        ],
+        tags=["tuning", "modeling"],
     )
 
     make_model_predictions = Pipeline(
@@ -154,9 +149,9 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="model_predictions",
                 name="make_model_predictions",
-                tags=["predictions", "modeling"],
             )
-        ]
+        ],
+        tags=["predictions", "modeling"],
     )
 
     invert_numerical_target_to_category = Pipeline(
@@ -169,7 +164,6 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="adj_index_to_string_encoder",
                 name="adj_index_to_string_encoding",
-                tags=["inverting", "modeling"],
             ),
             node(
                 func=target_column_inverter,
@@ -182,9 +176,9 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="inverted_model_predictions",
                 name="inverting_model_predictions",
-                tags=["inverting", "modeling"],
             ),
-        ]
+        ],
+        tags=["inverting", "modeling"],
     )
 
     performance_evaluation = Pipeline(
@@ -202,9 +196,9 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 },
                 outputs="prediction_evaluation_dict",
                 name="prediction_evaluation",
-                tags=["evaluation", "modeling"],
             )
-        ]
+        ],
+        tags=["evaluation", "modeling"],
     )
 
     modeling_nodes = [
