@@ -3,7 +3,10 @@
 from kedro.pipeline import Pipeline, node
 
 from general.functions.preprocessing.filtering import filter_dataframe
-from general.nodes.modeling.model_inference import model_prediction
+from general.nodes.modeling.model_inference import (
+    model_prediction,
+    target_column_inverter,
+)
 from general.nodes.preprocessing.transformer import fit, transform
 
 filter_dataframe_node = Pipeline(
@@ -64,9 +67,21 @@ make_model_predictions = Pipeline(
             },
             outputs="model_predictions_inference",
             name="model_predictions_inference",
-            tags=["predictions", "inference"],
-        )
-    ]
+        ),
+        node(
+            func=target_column_inverter,
+            inputs={
+                "data": "model_predictions_inference",
+                "inverter": "adj_index_to_string_encoder",
+                "target_column_name": "params:target_variable.encoder.outputCol",
+                "prediction_suffix": "params:model_params.prediction_suffix",
+                "index_suffix": "params:inverter_params.index_sub_suffix",
+            },
+            outputs="inverted_model_predictions_inference",
+            name="inverting_model_predictions_inference",
+        ),
+    ],
+    tags=["predictions", "inference"],
 )
 
 

@@ -51,7 +51,7 @@ def create_pipeline(
             node(
                 func=calculate_feature_importance,
                 inputs={
-                    "model": "best_fitted_model",
+                    "model": "prediction_model",
                     "feature_name_list": "feature_name_list",
                 },
                 outputs="feature_importance_report",

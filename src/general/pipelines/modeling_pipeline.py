@@ -148,7 +148,7 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                     "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
                 },
                 outputs="model_predictions",
-                name="make_model_predictions",
+                name="model_predictions",
             )
         ],
         tags=["predictions", "modeling"],
