@@ -40,7 +40,7 @@ model_prediction = Pipeline(
             func=model_prediction,
             inputs={
                 "data": "imputed_dataset_inference",
-                "trained_model": "best_fitted_model",
+                "trained_model": "prediction_model",
                 "prediction_suffix": "params:model_params.prediction_suffix",
                 "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
             },

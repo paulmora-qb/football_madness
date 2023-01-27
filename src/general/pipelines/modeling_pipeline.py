@@ -130,7 +130,7 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                     "tuner": "params:tuning_params.tuning_func",
                     "param_grid": "params:tuning_params.param_grid",
                 },
-                outputs=["best_fitted_model", "optimal_tuning_params"],
+                outputs=["prediction_model", "optimal_tuning_params"],
                 name="hyperparameter_tune",
             ),
         ],
@@ -143,7 +143,7 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
                 func=model_prediction,
                 inputs={
                     "data": "assembled_imputed_dataset",
-                    "trained_model": "best_fitted_model",
+                    "trained_model": "prediction_model",
                     "prediction_suffix": "params:model_params.prediction_suffix",
                     "prediction_proba_suffix": "params:model_params.prediction_proba_suffix",
                 },
