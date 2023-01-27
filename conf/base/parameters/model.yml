@@ -54,7 +54,7 @@ tuning_params:
       labelCol: tgt_full_time_result_index
       metricName: f1
   param_grid:
-    maxDepth: [5, 10]
+    maxDepth: [10]
 
 model_params:
   prediction_suffix: _pred
