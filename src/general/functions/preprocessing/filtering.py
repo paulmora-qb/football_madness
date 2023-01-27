@@ -30,5 +30,5 @@ def filter_dataframe(
         (f.col("home_team") == reference_team) | (f.col("away_team") == reference_team)
     ).filter(f.col("season") == reference_season)
 
-    assert filter_dataframe.count() > 0, f"The filtered dataframe is empty"
+    assert filtered_dataframe.count() > 0, f"The filtered dataframe is empty"
     return filtered_dataframe
