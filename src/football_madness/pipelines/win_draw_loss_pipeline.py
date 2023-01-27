@@ -50,13 +50,6 @@ def create_master_pipeline() -> Pipeline:
                 name="transform_target_variable_encoder",
                 tags=["master_table"],
             ),
-            node(
-                func=lambda x: x.labels,
-                inputs="fitted_target_variable_encoder",
-                outputs="target_encoder_index_labels",
-                name="extracting_labels_from_target_encoder",
-                tags=["master_table"],
-            ),
         ]
     )
 
