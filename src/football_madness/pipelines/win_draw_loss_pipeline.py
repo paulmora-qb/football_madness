@@ -36,7 +36,7 @@ def create_master_pipeline() -> Pipeline:
                     "data": "intermediate_target_variable",
                     "transformer": "params:target_variable.encoder",
                 },
-                outputs="fitted_target_variable_encoder",
+                outputs="target_variable_encoder",
                 name="fitting_target_variable_encoder",
                 tags=["master_table"],
             ),
@@ -44,10 +44,17 @@ def create_master_pipeline() -> Pipeline:
                 func=transform,
                 inputs={
                     "data": "intermediate_target_variable",
-                    "transformer": "fitted_target_variable_encoder",
+                    "transformer": "target_variable_encoder",
                 },
                 outputs="target_variable",
                 name="transform_target_variable_encoder",
+                tags=["master_table"],
+            ),
+            node(
+                func=lambda x: x.labels,
+                inputs="target_variable_encoder",
+                outputs="target_encoder_index_labels",
+                name="extracting_labels_from_target_encoder",
                 tags=["master_table"],
             ),
         ]
