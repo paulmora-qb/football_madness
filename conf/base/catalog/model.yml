@@ -13,9 +13,10 @@ _pickle: &pickle
 _spark_ml: &spark_ml
   type: football_madness.extras.datasets.spark_ml.SparkMLDataSet
 
-fitted_target_variable_encoder:
-  type: MemoryDataSet
-  copy_mode: assign
+target_variable_encoder:
+  <<: *spark_ml
+  filepath: ./data/06_models/target_variable_encoder
+  load_instance: pyspark.ml.feature.StringIndexerModel
 
 target_encoder_index_labels:
   <<: *pickle
@@ -71,6 +72,10 @@ model_predictions:
   <<: *pq
   filepath: ./data/07_model_output/model_predictions
 
+adj_index_to_string_encoder:
+  <<: *pickle
+  filepath: ./data/05_model_input/adj_index_to_string_encoder
+
 inverted_model_predictions:
   <<: *pq
   filepath: ./data/07_model_output/inverted_model_predictions
@@ -94,3 +99,7 @@ assembled_imputed_dataset_inference:
 model_predictions_inference:
   <<: *pq
   filepath: ./data/07_model_output/model_predictions_inference
+
+inverted_model_predictions_inference:
+  <<: *pq
+  filepath: ./data/07_model_output/inverted_model_predictions_inference
