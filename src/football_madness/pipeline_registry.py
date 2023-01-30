@@ -3,13 +3,13 @@ from typing import Dict
 
 from kedro.pipeline import Pipeline
 
+from data_loading import create_data_loading_pipeline
 from feature_engineering.pipeline import (
     create_pipeline as create_feature_engineering_pipeline,
 )
 from football_madness.pipelines.win_draw_loss_pipeline import (
     create_pipeline as create_win_draw_loss_pipeline,
 )
-from preprocessing import create_preprocessing_pipeline
 
 
 def register_pipelines() -> Dict[str, Pipeline]:
@@ -19,9 +19,7 @@ def register_pipelines() -> Dict[str, Pipeline]:
         A mapping from a pipeline name to a ``Pipeline`` object.
     """
     return {
-        "preprocessing": create_preprocessing_pipeline(),
+        "data_loading": create_data_loading_pipeline(),
         "feature_engineering": create_feature_engineering_pipeline(),
-        "win_draw_loss_prediction": create_win_draw_loss_pipeline(
-            categorical_target=True
-        ),
+        "win_draw_loss_prediction": create_win_draw_loss_pipeline(),
     }

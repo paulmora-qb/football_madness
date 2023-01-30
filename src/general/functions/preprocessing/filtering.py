@@ -11,7 +11,8 @@ def filter_dataframe(
     in the end. Herein we namely filter the two column
 
     Args:
-        data (DataFrame): Data should be filtered down. Should have 
+        data (DataFrame): Data should be filtered down. Should have the columns
+            `home_team`, `away_team` and `season` in order to filter
         reference_season (str): Season for which we would like to filter
         reference_team (str): Team for which we would like to get the predictions
 

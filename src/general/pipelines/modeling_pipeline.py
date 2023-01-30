@@ -18,7 +18,7 @@ from general.nodes.preprocessing.transformer import fit, transform
 from utilities.helper import update_dictionary
 
 
-def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
+def create_pipeline(categorical_target: str) -> Pipeline:
     """_summary_
 
     Args:
@@ -217,8 +217,6 @@ def create_pipeline(model_type: str, categorical_target: str) -> Pipeline:
     return Pipeline(modeling_nodes)
 
 
-def create_modeling_pipeline(
-    model_type: str = "classification", categorical_target: str = False
-):
+def create_modeling_pipeline(categorical_target: str = False):
     """For adjusting whether we are dealing with a classification or regression case"""
-    return create_pipeline(model_type=model_type, categorical_target=categorical_target)
+    return create_pipeline(categorical_target=categorical_target)

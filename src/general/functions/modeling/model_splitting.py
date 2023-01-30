@@ -4,6 +4,7 @@ from typing import Dict
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
+from pyspark.sql.types import IntegerType
 
 
 def split_train_test_dataframe(
@@ -23,22 +24,22 @@ def split_train_test_dataframe(
             observation belongs to train or test 
     """
 
-    target_column_name = splitting_params["target_column_name"]
-    # Note that the category can be in type float, given that we had to apply stringindexer
-    unqiue_category_values = [
-        data[0] for data in data.select(target_column_name).distinct().collect()
-    ]
+    split_date_col_name = splitting_params["split_date_col_name"]
+    number_of_test_time = splitting_params["test_period_years"]
+    number_of_train_time = splitting_params["train_period_years"]
 
-    train_size = splitting_params["train_size"]
-    fractions = {x: train_size for x in unqiue_category_values}
+    max_test_year = data.select(f.max(f.col(split_date_col_name))).collect()[0][0]
+    min_test_year = max_test_year - number_of_test_time
+    min_train_year = min_test_year - number_of_train_time
 
-    seed = splitting_params["seed"]
-    train_data = data.sampleBy(target_column_name, fractions=fractions, seed=seed)
-    test_data = data.subtract(train_data)
+    # Remove all data before the min train year
+    data = data.filter(f.col(split_date_col_name) > min_train_year)
 
-    train_data = train_data.withColumn("split", f.lit("TRAIN"))
-    test_data = test_data.withColumn("split", f.lit("TEST"))
+    # Create the indication whether data point belongs to train or test
+    data.withColumn(
+        "split",
+        f.when(f.col("season_end_year") <= min_test_year, "TRAIN").otherwise("TEST"),
+    )
 
-    # TODO: Think about validation split
     return train_data.union(test_data)
 

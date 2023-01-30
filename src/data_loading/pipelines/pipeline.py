@@ -6,7 +6,7 @@ from kedro.pipeline import Pipeline
 from .nodes import concatenate_raw_data_node
 
 
-def create_preprocessing_pipeline() -> Pipeline:
+def create_data_loading_pipeline() -> Pipeline:
     """Create a pipeline to create data from different leagues
 
     Returns:

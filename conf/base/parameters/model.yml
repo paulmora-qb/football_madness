@@ -25,9 +25,10 @@ master_table:
     - ftr_momentum
 
 splitting_params:
-  target_column_name: *target_variable
-  train_size: 0.8
-  seed: 42
+  date_col_name: season_end_year
+  train_period_years: 10y
+  test_period_years: 1y
+  season_column: seasons
 
 imputing_transformer:
   object: pyspark.ml.feature.Imputer

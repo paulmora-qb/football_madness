@@ -38,8 +38,7 @@ apply_imputer = Pipeline(
     ]
 )
 
-
-assembling = Pipeline(
+make_model_predictions = Pipeline(
     nodes=[
         node(
             func=transform,
@@ -50,13 +49,6 @@ assembling = Pipeline(
             outputs="assembled_imputed_dataset_inference",
             name="assembling_features_inference",
         ),
-    ],
-    tags=["assembling", "inference"],
-)
-
-
-make_model_predictions = Pipeline(
-    nodes=[
         node(
             func=model_prediction,
             inputs={
@@ -68,6 +60,12 @@ make_model_predictions = Pipeline(
             outputs="model_predictions_inference",
             name="model_predictions_inference",
         ),
+    ],
+    tags=["predictions", "inference"],
+)
+
+invert_categorical_target = Pipeline(
+    nodes=[
         node(
             func=target_column_inverter,
             inputs={
@@ -80,13 +78,15 @@ make_model_predictions = Pipeline(
             outputs="inverted_model_predictions_inference",
             name="inverting_model_predictions_inference",
         ),
-    ],
-    tags=["predictions", "inference"],
+    ]
 )
 
 
-def create_pipeline():
+def create_pipeline(categorical_target: bool) -> Pipeline:
 
-    nodes = [filter_dataframe_node, apply_imputer, assembling, make_model_predictions]
+    nodes = [filter_dataframe_node, apply_imputer, make_model_predictions]
+
+    if categorical_target:
+        nodes += [invert_categorical_target]
 
     return Pipeline(nodes, tags=["inference"])
