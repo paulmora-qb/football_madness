@@ -21,5 +21,5 @@ def register_pipelines() -> Dict[str, Pipeline]:
     return {
         "data_loading": create_data_loading_pipeline(),
         "feature_engineering": create_feature_engineering_pipeline(),
-        "win_draw_loss_prediction": create_win_draw_loss_pipeline(),
+        "prediction": create_win_draw_loss_pipeline(),
     }

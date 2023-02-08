@@ -1,4 +1,4 @@
-"""Creating the pipeline for prediticting the results"""
+"""Creating the pipeline for predicting the results"""
 
 from functools import partial
 

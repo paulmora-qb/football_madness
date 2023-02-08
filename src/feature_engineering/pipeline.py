@@ -4,6 +4,7 @@
 from kedro.pipeline import Pipeline, node
 
 from feature_engineering.momentum import create_momentum_features
+from feature_engineering.past_interaction import create_past_interaction_features
 from general.functions.feature_engineering.spine import (
     create_match_spine,
     create_team_spine,
@@ -41,10 +42,19 @@ def create_pipeline() -> Pipeline:
         tags=["feature_engineering"],
     )
 
+    past_interaction_node = node(
+        func=create_past_interaction_features,
+        inputs=["match_spine", "params:feature.past_interaction"],
+        outputs="ftr_past_interaction",
+        name="create_past_interaction_features",
+        tags=["feature_engineering"],
+    )
+
     feature_engineering_nodes = [
         match_spine_node,
         team_spine_node,
         momentum_features_node,
+        past_interaction_node,
     ]
 
     return Pipeline(feature_engineering_nodes)

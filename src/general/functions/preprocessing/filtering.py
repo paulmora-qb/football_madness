@@ -27,9 +27,15 @@ def filter_dataframe(
     )
     assert len(column_difference) == 0, f"The column(s) {column_difference} are missing"
 
-    filtered_dataframe = data.filter(
+    filtered_dataframe = data
+
+    # Filtering the team
+    filtered_dataframe = filtered_dataframe.filter(
         (f.col("home_team") == reference_team) | (f.col("away_team") == reference_team)
-    ).filter(f.col("season") == reference_season)
+    )
+
+    # Filtering the season
+    filtered_dataframe = filtered_dataframe.filter(f.col("season") == reference_season)
 
     assert filtered_dataframe.count() > 0, f"The filtered dataframe is empty"
     return filtered_dataframe

@@ -72,29 +72,14 @@ feature:
           - full_time_opponent_goals
           - points_per_game
         aggregation_type: pyspark.sql.functions.avg
-        rows_between: [-30, -1]
+        rows_between: [[-30, -1], [-5, -1]]
         prefix: ftr_window
         suffix: last_games
-    #   - object: general.functions.feature_engineering.aggregation.create_window_aggregates
-    #     partition_by: ["team", "season"]
-    #     order_by: ["datediff"]
-    #     aggregation_columns:
-    #       - full_time_goals
-    #       - shots_target
-    #       - full_time_opponent_goals
-    #       - opponent_shots_target
-    #     aggregation_type:
-    #       - object: pyspark.sql.functions.avg
-    #     rows_between: [-3, -1]
-    #     prefix: ftr_window
-    #     suffix: last_games
-    # - object: feature_engineering.core.aggregation.create_last_season_indicator
-    #   partition_by: ["team"]
-    #   order_by: ["date"]
-    #   aggregation_columns:
-    #     - team_yellows
-    #     - team_reds
-    #   aggregation_type: pyspark.sql.functions.sum
-    #   rows_between: [1, 1]
-    #   prefix: number_of
-    #   suffix: previous_game
+  past_interaction:
+    - object: general_functions.feature_engineering.historic_interaction.create_past_interaction_feature
+      partition_by: ["team"]
+      order_by: ["datediff"]
+      home_team_column: home_team
+      away_team_column: away_team
+      prefix: past_interaction
+      suffix: score

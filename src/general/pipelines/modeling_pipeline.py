@@ -82,7 +82,7 @@ def create_pipeline(categorical_target: str) -> Pipeline:
                     "transformer": "adjusted_imputing_transformer_output",
                 },
                 outputs="fitted_imputer",
-                name="fitting_imputerimputation",
+                name="fitting_imputer",
             ),
             node(
                 func=transform,
@@ -106,7 +106,7 @@ def create_pipeline(categorical_target: str) -> Pipeline:
                     "value": "feature_name_list",
                 },
                 outputs="adjusted_assembler",
-                name="adjusintg_assembler_configuration",
+                name="adjusting_assembler_configuration",
             ),
             node(
                 func=transform,
