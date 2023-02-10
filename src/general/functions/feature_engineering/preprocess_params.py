@@ -25,16 +25,16 @@ def _get_column_names(params: Dict[str, Any], function_name: str) -> Set[str]:
             ranges = params["range_between"]
             range_str = "range"
 
-            for col in params["aggregation_columns"]:
-                for range in ranges:
-                    output_column_name = create_window_column_name(
-                        prefix=params["prefix"],
-                        col=col,
-                        range_str=range_str,
-                        range=range,
-                        suffix=params["suffix"],
-                    )
-            columns_created.add(output_column_name)
+        for col in params["aggregation_columns"]:
+            for range in ranges:
+                output_column_name = create_window_column_name(
+                    prefix=params["prefix"],
+                    col=col,
+                    range_str=range_str,
+                    range=range,
+                    suffix=params["suffix"],
+                )
+                columns_created.add(output_column_name)
 
     else:
         columns_created.add(params["column_name"])

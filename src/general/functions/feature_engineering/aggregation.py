@@ -1,5 +1,6 @@
 """Function with create window aggregations"""
 
+import re
 from typing import List
 
 from pyspark.sql import functions as f
@@ -44,7 +45,7 @@ def dynamic_post_window_aggregation(
     math_operation: str,
     output_column_name: str,
 ):
-    a = 1
+    matched_left_columns = [re.match(left_column, col) for col in existing_columns]
 
 
 def create_window_column_name(

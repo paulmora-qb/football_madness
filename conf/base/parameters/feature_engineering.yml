@@ -97,6 +97,7 @@ feature:
           - playing_away
           - winning_the_game
           - drawing_the_game
+          - losing_the_game
         aggregation_type: pyspark.sql.functions.avg
         rows_between: [[-30, -1], [-5, -1]]
         prefix: ftr_window_team
@@ -115,13 +116,18 @@ feature:
         suffix: last_interaction
     post_window_operations:
       - object: general.functions.feature_engineering.aggregation.dynamic_post_window_aggregation
-        left_column: ftr_window_winning_the_game_(?P<window>.*)_last_games
-        right_column: ftr_window_playing_at_home_(?P<window>.*)_last_games
+        left_column: ftr_window_team_winning_the_game_(?P<window>.*)_last_games
+        right_column: ftr_window_team_playing_at_home_(?P<window>.*)_last_games
         math_operation: /
         output_column: ftr_ratio_winning_game_at_home_(?P<window>.*)
       - object: general.functions.feature_engineering.aggregation.dynamic_post_window_aggregation
-        left_column: ftr_window_drawing_the_game_(?P<window>.*)_last_games
-        right_column: ftr_window_playing_at_home_(?P<window>.*)_last_games
+        left_column: ftr_window_team_drawing_the_game_(?P<window>.*)_last_games
+        right_column: ftr_window_team_playing_at_home_(?P<window>.*)_last_games
+        math_operation: /
+        output_column: ftr_ratio_drawing_game_at_home_(?P<window>.*)
+      - object: general.functions.feature_engineering.aggregation.dynamic_post_window_aggregation
+        left_column: ftr_window_team_losing_the_game_(?P<window>.*)_last_games
+        right_column: ftr_window_team_playing_at_home_(?P<window>.*)_last_games
         math_operation: /
         output_column: ftr_ratio_drawing_game_at_home_(?P<window>.*)
     # - object: general.functions.feature_engineering.aggregation.basic_algebra
