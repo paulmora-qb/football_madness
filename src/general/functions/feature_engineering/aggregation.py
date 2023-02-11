@@ -1,7 +1,8 @@
 """Function with create window aggregations"""
 
 import re
-from typing import List
+from itertools import product
+from typing import Dict, List, Tuple
 
 from pyspark.sql import functions as f
 from pyspark.sql.window import Window
@@ -44,8 +45,73 @@ def dynamic_post_window_aggregation(
     right_column: str,
     math_operation: str,
     output_column_name: str,
-):
-    matched_left_columns = [re.match(left_column, col) for col in existing_columns]
+) -> List[Dict]:
+    """Function which creates ratios of window functions.
+
+    Args:
+        existing_columns (List[str]): List of column names that already exists
+        left_column (str): Column on the left side of the equation
+        right_column (str): Column name of the right side of the equation
+        math_operation (str): Math operation of the columns
+        output_column_name (str): Name of the resulting column
+    """
+
+    def _extract_regex_match_and_column(
+        column: str, existing_columns: List[str]
+    ) -> List[Tuple]:
+        matched_cols = [re.match(column, col) for col in existing_columns]
+        return [
+            (c, re_match)
+            for c, re_match in zip(existing_columns, matched_cols)
+            if re_match
+        ]
+
+    def _extract_matching_groupdict(
+        dictionary: Dict[str, str], key_master_list: List[str]
+    ) -> Dict[str, str]:
+        return {
+            key: value
+            for key, value in dictionary.groupdict().items()
+            if key in key_master_list
+        }
+
+    newly_created_columns = []
+    matched_left_columns = _extract_regex_match_and_column(
+        left_column, existing_columns
+    )
+    matched_right_columns = _extract_regex_match_and_column(
+        right_column, existing_columns
+    )
+
+    common_capture_group_names = set(
+        re.compile(left_column).groupindex.keys()
+    ).intersection(set(re.compile(right_column).groupindex.keys()))
+
+    new_columns_list = []
+    for (left_col, left_match), (right_col, right_match) in product(
+        matched_left_columns, matched_right_columns
+    ):
+
+        common_left_regex_dictionary = _extract_matching_groupdict(
+            left_match, common_capture_group_names
+        )
+        common_right_regex_dictionary = _extract_matching_groupdict(
+            right_match, common_capture_group_names
+        )
+
+        if common_left_regex_dictionary == common_right_regex_dictionary:
+            filled_output_column_name = output_column_name.format(
+                **common_left_regex_dictionary
+            )
+
+            newly_created_columns.append(
+                {
+                    "object": "general.functions.feature_engineering.flags.expr_flag",
+                    "expr": f"{left_col} {math_operation} {right_col}",
+                    "column_name": filled_output_column_name,
+                }
+            )
+    return newly_created_columns
 
 
 def create_window_column_name(

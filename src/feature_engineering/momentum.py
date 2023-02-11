@@ -47,7 +47,7 @@ def create_momentum_features(
         )
     )
 
-    regex = re.compile("ftr_window_.*")
+    regex = re.compile("ftr_.*")
     feature_columns = core_columns + list(filter(regex.match, df.columns))
     return df.select(feature_columns).na.drop()
 

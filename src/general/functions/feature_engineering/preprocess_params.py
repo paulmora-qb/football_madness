@@ -7,13 +7,15 @@ from general.functions.feature_engineering.aggregation import create_window_colu
 
 
 def _get_column_names(params: Dict[str, Any], function_name: str) -> Set[str]:
-    """_summary_
+    """Function to get all columns names of features that were already build. Herein
+    we have to differentiate between window aggregates columns and those which were not
+    build with windows
 
     Args:
-        params (Dict[str, Any]): _description_
+        params (Dict[str, Any]): Parameters to build features
 
     Returns:
-        Set[str]: _description_
+        Set[str]: Name of all columns that were build
     """
     columns_created = set()
 
@@ -24,6 +26,9 @@ def _get_column_names(params: Dict[str, Any], function_name: str) -> Set[str]:
         else:
             ranges = params["range_between"]
             range_str = "range"
+
+        if isinstance(ranges[0], int):
+            ranges = [ranges]
 
         for col in params["aggregation_columns"]:
             for range in ranges:
@@ -64,12 +69,14 @@ def preprocess_params(params: Dict[str, str]) -> Dict[str, str]:
             if function_name.startswith("dynamic"):
                 module_object = import_module(module_name)
                 dynamic_function = getattr(module_object, function_name)
-                updated_feature_dict, column_names = dynamic_function(
-                    existing_columns=generated_column_names,
-                    left_column=feature_dict["left_column"],
-                    right_column=feature_dict["right_column"],
-                    math_operation=feature_dict["math_operation"],
-                    output_column_name=feature_dict["output_column"],
+                new_feature_group_list.append(
+                    dynamic_function(
+                        existing_columns=generated_column_names,
+                        left_column=feature_dict["left_column"],
+                        right_column=feature_dict["right_column"],
+                        math_operation=feature_dict["math_operation"],
+                        output_column_name=feature_dict["output_column"],
+                    )
                 )
             else:
                 column_names = _get_column_names(feature_dict, function_name)
