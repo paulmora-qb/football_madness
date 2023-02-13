@@ -1,6 +1,6 @@
 """Function for a barplot"""
 
-from typing import Tuple
+from typing import Any, Dict, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -8,26 +8,28 @@ import seaborn as sns
 from matplotlib.figure import Figure
 
 
-def plot_barplot(
-    data: pd.DataFrame,
-    x: str,
-    y: str,
-    hue: str = None,
-    limit_bars: int = None,
-    figsize: Tuple[int] = (16, 9),
-    palette: str = "Blues_r",
-    rotation: int = 45,
-    xlabel: str = "X Axis",
-    ylabel: str = "Y Axis",
-    legend_title: str = None,
-    legend_title_fontsize: int = 17,
-    legend_fontsize: int = 15,
-    label_fontsize: int = 20,
-    tick_fontsize: int = 18,
-) -> Figure:
+def plot_barplot(data: pd.DataFrame, params: Dict[str, Any]) -> Figure:
     """Function to plot generic barplots using seaborn"""
 
+    x = params.get("x")
+    y = params.get("y")
+    hue = params.get("hue", None)
+    limit_bars = params.get("limit_bars", None)
+    figsize = params.get("figsize", (16, 9))
+    palette = params.get("palette", "Blues_r")
+    rotation = params.get("rotation", 45)
+    xlabel = params.get("xlabel", "X Axis")
+    ylabel = params.get("ylabel", "Y Axis")
+    legend_title = params.get("legend_title", None)
+    legend_title_fontsize = params.get("legend_title_fontsize", 17)
+    legend_fontsize = params.get("legend_fontsize", 15)
+    label_fontsize = params.get("label_fontsize", 20)
+    tick_fontsize = params.get("tick_fontsize", 18)
+
     fig, axs = plt.subplots(figsize=figsize)
+    if limit_bars:
+        data = data.iloc[:limit_bars, :]
+
     barplot_settings = {
         "data": data,
         "x": x,
@@ -35,9 +37,6 @@ def plot_barplot(
         "palette": palette,
         "ax": axs,
     }
-
-    if limit_bars:
-        data = data.iloc[:limit_bars, :]
 
     if hue:
         barplot_settings["hue"] = hue
@@ -49,7 +48,7 @@ def plot_barplot(
         axs.legend(
             title=legend_title,
             prop={"size": legend_fontsize},
-            title_fontisze=legend_title_fontsize,
+            title_fontsize=legend_title_fontsize,
         )
 
     # Ticks

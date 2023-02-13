@@ -5,7 +5,7 @@ from pyspark.sql import functions as f
 
 
 def filter_dataframe(
-    data: DataFrame, reference_season: str, reference_team: str
+    data: DataFrame, reference_season: str = None, reference_team: str = None
 ) -> DataFrame:
     """This function filters the master table down to what is desired to be predicted
     in the end. Herein we namely filter the two column
@@ -20,6 +20,11 @@ def filter_dataframe(
         DataFrame: Filtered dataframe
     """
 
+    if (not reference_season) and (not reference_team):
+        raise ValueError(
+            "Either reference season or reference team has to be specified"
+        )
+
     dataframe_columns = data.columns
 
     column_difference = set(["season", "home_team", "away_team"]) - set(
@@ -30,12 +35,17 @@ def filter_dataframe(
     filtered_dataframe = data
 
     # Filtering the team
-    filtered_dataframe = filtered_dataframe.filter(
-        (f.col("home_team") == reference_team) | (f.col("away_team") == reference_team)
-    )
+    if reference_team:
+        filtered_dataframe = filtered_dataframe.filter(
+            (f.col("home_team") == reference_team)
+            | (f.col("away_team") == reference_team)
+        )
 
     # Filtering the season
-    filtered_dataframe = filtered_dataframe.filter(f.col("season") == reference_season)
+    if reference_season:
+        filtered_dataframe = filtered_dataframe.filter(
+            f.col("season") == reference_season
+        )
 
     assert filtered_dataframe.count() > 0, f"The filtered dataframe is empty"
     return filtered_dataframe

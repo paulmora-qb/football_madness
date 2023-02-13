@@ -27,7 +27,10 @@ def create_pipeline() -> Pipeline:
 
     team_spine_node = node(
         func=create_team_spine,
-        inputs=["concatenated_raw_data",],
+        inputs={
+            "match_data": "concatenated_raw_data",
+            "target_column": "params:team_spine_target_column",
+        },
         outputs="team_spine",
         name="create_team_spine",
         tags=["feature_engineering"],

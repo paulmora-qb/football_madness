@@ -3,6 +3,7 @@
 from kedro.pipeline import Pipeline, node
 
 from general.functions.preprocessing.filtering import filter_dataframe
+from general.functions.reporting.utils.prediction_sorting import create_standing_table
 from general.nodes.modeling.model_inference import (
     model_prediction,
     target_column_inverter,
@@ -81,12 +82,26 @@ invert_categorical_target = Pipeline(
     ]
 )
 
+create_final_table = Pipeline(
+    nodes=[
+        node(
+            func=create_standing_table,
+            inputs={"data": "inverted_model_predictions_inference"},
+            outputs="standing_table_inference",
+            name="standing_table_inference",
+        )
+    ]
+)
 
-def create_pipeline(categorical_target: bool) -> Pipeline:
+
+def create_pipeline(categorical_target: bool, create_standing_table: bool) -> Pipeline:
 
     nodes = [filter_dataframe_node, apply_imputer, make_model_predictions]
 
     if categorical_target:
         nodes += [invert_categorical_target]
+
+    if create_standing_table:
+        nodes += [create_final_table]
 
     return Pipeline(nodes, tags=["inference"])

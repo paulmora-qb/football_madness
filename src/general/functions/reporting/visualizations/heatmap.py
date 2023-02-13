@@ -1,6 +1,6 @@
 """Function to plot heatmap"""
 
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -8,23 +8,22 @@ import seaborn as sns
 from matplotlib.figure import Figure
 
 
-def plot_heatmap(
-    data: pd.DataFrame,
-    figsize: Tuple[int] = (10, 10),
-    vmin: float = None,
-    vmax: float = None,
-    cmap: str = "Blues",
-    annot: bool = True,
-    fmt: str = ".2g",
-    linewidths: int = 1,
-    xlabel: str = "X Axis",
-    ylabel: str = "Y Axis",
-    label_fontsize: int = 20,
-    tick_fontsize: int = 16,
-    colormap_fontsize: int = 16,
-    annot_kws: Dict[str, int] = {"fontsize": 14},
-) -> Figure:
+def plot_heatmap(data: pd.DataFrame, params: Dict[str, Any]) -> Figure:
     """Function to plot generic heatmap using seaborn"""
+
+    figsize = params.get("figsize", (10, 10))
+    vmin = params.get("vmin", None)
+    vmax = params.get("vmax", None)
+    cmap = params.get("cmap", "Blues")
+    annot = params.get("annot", True)
+    fmt = params.get("fmt", "g")
+    linewidths = params.get("linewidths", 1)
+    xlabel = params.get("xlabel", "X Axis")
+    ylabel = params.get("ylabel", "Y Axis")
+    label_fontsize = params.get("label_fontsize", 20)
+    tick_fontsize = params.get("tick_fontsize", 16)
+    colormap_fontsize = params.get("colormap_fontsize", 16)
+    annot_kws = params.get("annot_kws", {"fontsize": 14})
 
     fig, axs = plt.subplots(figsize=figsize)
 

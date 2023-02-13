@@ -6,13 +6,16 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
 
 
-def _create_generic_team_data(match_data: DataFrame, team_type: str) -> DataFrame:
+def _create_generic_team_data(
+    match_data: DataFrame, team_type: str, target_column: List[str]
+) -> DataFrame:
     """This function creates an overview of the team performance from the perspective
     of the home/away team. That facilitates the subsequent feature creation
 
     Args:
         match_data (DataFrame): The concatenated dataframe of all football results
         team_type (str): Indication whether the team was playing home/ away
+        target_column(List[str]): Name of the target column that is replaced 
 
     Returns:
         DataFrame: A dataframe from the perspective of the home/away team
@@ -56,13 +59,16 @@ def _create_generic_team_data(match_data: DataFrame, team_type: str) -> DataFram
     return match_data
 
 
-def create_team_spine(match_data: DataFrame) -> DataFrame:
+def create_team_spine(match_data: DataFrame, target_column: List[str]) -> DataFrame:
     """This function concatenates the home and away data after they have been stated
         in a generic format.
 
     Args:
         match_data (DataFrame): Match dataset which contains the information of the home
             and away team and their respective statistics
+        target_column (List[str]): List of column names which are initially indicating
+            whether the 'home' or 'away' team won, but after the transformation indicate
+            whether the team 'won', or incurred a 'loss'
 
     Returns:
         DataFrame: Concatenated generically stated dataset. This dataset does not have
@@ -70,12 +76,17 @@ def create_team_spine(match_data: DataFrame) -> DataFrame:
             stated.
     """
 
-    # Reshape data into one row per team
-    home_team_data = _create_generic_team_data(match_data, team_type="home")
-    away_team_data = _create_generic_team_data(match_data, team_type="away")
-    team_spine = home_team_data.unionByName(away_team_data)
+    if isinstance(target_column, str):
+        target_column = [target_column]
 
-    return team_spine
+    # Reshape data into one row per team
+    home_team_data = _create_generic_team_data(
+        match_data, team_type="home", target_column=target_column
+    )
+    away_team_data = _create_generic_team_data(
+        match_data, team_type="away", target_column=target_column
+    )
+    return home_team_data.unionByName(away_team_data)
 
 
 def create_match_spine(match_data: DataFrame, params: Dict[str, str]) -> DataFrame:

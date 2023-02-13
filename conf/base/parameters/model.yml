@@ -1,3 +1,7 @@
+reference_season: # Placeholder
+reference_team: # Placeholder
+reference_league: # Placeholder
+
 target_variable:
   target_column_name: full_time_result
   keys:
@@ -17,8 +21,8 @@ master_table:
 
 splitting_params:
   season_col_name: season
-  train_period_seasons: 10
-  test_period_seasons: 1
+  train_period_seasons: 15
+  test_period_seasons: 2
   season_column: seasons
 
 imputing_transformer:
@@ -39,6 +43,7 @@ tuning_params:
       object: pyspark.ml.classification.RandomForestClassifier
       labelCol: *target_variable
       featuresCol: features
+      weightCol: *target_variable
     evaluator:
       object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
       predictionCol: prediction

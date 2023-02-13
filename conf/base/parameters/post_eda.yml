@@ -1,4 +1,3 @@
-
 performance_metrics_plot:
   x: metric
   y: performance
@@ -13,14 +12,13 @@ feature_importance_plot:
   xlabel: Feature Names
   ylabel: Normalized Feature Importance
   limit_bars: 20
+  rotation: 45
 
 confusion_matrix_preparation:
   prediction_column_name: tgt_full_time_result_pred
   target_column_name: full_time_result
-  scaled: True
+  scaled: False
 
 confusion_matrix_plot:
-  vmin: 0
-  vmax: 1
-  xlabel: True Value
-  ylabel: Prediction Value
+  xlabel: Prediction Value
+  ylabel: True Value
