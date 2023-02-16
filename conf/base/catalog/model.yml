@@ -103,3 +103,11 @@ model_predictions_inference:
 inverted_model_predictions_inference:
   <<: *pq
   filepath: ./data/07_model_output/inverted_model_predictions_inference
+
+standing_table_inference:
+  <<: *pq
+  filepath: ./data/07_model_output/standing_table_inference
+
+standing_table_inference:
+  <<: *pickle
+  filepath: ./data/07_model_output/kendall_tau_value

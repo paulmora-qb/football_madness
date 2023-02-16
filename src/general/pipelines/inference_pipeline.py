@@ -18,6 +18,7 @@ filter_dataframe_node = Pipeline(
                 "data": "master_table",
                 "reference_team": "params:reference_team",
                 "reference_season": "params:reference_season",
+                "reference_league": "params:reference_league",
             },
             outputs="master_table_inference",
             name="filter_master_table_inference",
@@ -87,7 +88,7 @@ create_final_table = Pipeline(
         node(
             func=create_standing_table,
             inputs={"data": "inverted_model_predictions_inference"},
-            outputs="standing_table_inference",
+            outputs=["standing_table_inference", "kendall_tau"],
             name="standing_table_inference",
         )
     ]

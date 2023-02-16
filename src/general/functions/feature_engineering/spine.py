@@ -1,6 +1,6 @@
 """Create team spine"""
 
-from typing import Dict
+from typing import Dict, List
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as f
@@ -10,7 +10,9 @@ def _create_generic_team_data(
     match_data: DataFrame, team_type: str, target_column: List[str]
 ) -> DataFrame:
     """This function creates an overview of the team performance from the perspective
-    of the home/away team. That facilitates the subsequent feature creation
+    of the home/away team. That facilitates the subsequent feature creation. In addition
+    it is allowed to pass multiple columns which are replaced with the win/loss
+    indication.
 
     Args:
         match_data (DataFrame): The concatenated dataframe of all football results
@@ -54,7 +56,8 @@ def _create_generic_team_data(
     )
 
     # Clarifying which team won from the perspective of the home/away team
-    match_data = match_data.replace(win_lose_dict, subset="full_time_result")
+    for tgt_col in target_column:
+        match_data = match_data.replace(win_lose_dict, subset=tgt_col)
 
     return match_data
 

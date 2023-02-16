@@ -51,9 +51,9 @@ def filter_dataframe(
 
     # Filtering the league
     if reference_league:
-        filtered_dataframe = filter_dataframe.filter(
+        filtered_dataframe = filtered_dataframe.filter(
             f.col("league") == reference_league
         )
 
-    assert filtered_dataframe.count() > 0, f"The filtered dataframe is empty"
+    assert filtered_dataframe.count() > 0, "The filtered dataframe is empty"
     return filtered_dataframe
