@@ -112,6 +112,6 @@ standing_table_inference:
   <<: *pq
   filepath: ./data/07_model_output/standing_table_inference
 
-standing_table_inference:
+kendall_tau:
   <<: *pickle
   filepath: ./data/07_model_output/kendall_tau_value
