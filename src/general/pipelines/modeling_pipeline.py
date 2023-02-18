@@ -7,6 +7,7 @@ from kedro.pipeline import Pipeline, node
 from general.functions.model_development.data_dictionary.data_dictionary import (
     create_data_dictionary,
 )
+from general.functions.modeling.model_helper import creating_weight_col
 from general.functions.modeling.model_splitting import split_train_test_dataframe
 from general.nodes.modeling.model_evaluation import prediction_evaluation
 from general.nodes.modeling.model_inference import (
@@ -121,12 +122,29 @@ def create_pipeline(categorical_target: str) -> Pipeline:
         tags=["assembling", "modeling"],
     )
 
+    create_weight_column = Pipeline(
+        nodes=[
+            node(
+                func=creating_weight_col,
+                inputs={
+                    "data": "assembled_imputed_dataset",
+                    "target_col_name": "params:weight_column.target_column",
+                    "weight_col_name": "params:weight_column.weight_column",
+                },
+                outputs="assembled_imputed_dataset_w_weight_col",
+                name="create_weight_column",
+            )
+        ]
+    )
+
     hyperparameter_tuning = Pipeline(
         nodes=[
             node(
                 func=tuner,
                 inputs={
-                    "data": "assembled_imputed_dataset",
+                    "data": "assembled_imputed_dataset_w_weight_col"
+                    if categorical_target
+                    else "assembled_imputed_dataset",
                     "tuner": "params:tuning_params.tuning_func",
                     "param_grid": "params:tuning_params.param_grid",
                 },
@@ -212,7 +230,7 @@ def create_pipeline(categorical_target: str) -> Pipeline:
     ]
 
     if categorical_target:
-        modeling_nodes += [invert_numerical_target_to_category]
+        modeling_nodes += [create_weight_column, invert_numerical_target_to_category]
 
     return Pipeline(modeling_nodes)
 

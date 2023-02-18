@@ -63,6 +63,10 @@ assembled_imputed_dataset:
   <<: *pq
   filepath: ./data/05_model_input/assembled_imputed_dataset
 
+assembled_imputed_dataset_w_weight_col:
+  <<: *pq
+  filepath: ./data/05_model_input/assembled_imputed_dataset_w_weight_col
+
 prediction_model:
   <<: *spark_ml
   filepath: ./data/06_models/prediction_model

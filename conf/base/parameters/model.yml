@@ -33,6 +33,10 @@ assembler:
   object: pyspark.ml.feature.VectorAssembler
   outputCol: features
 
+weight_column:
+  target_column: *target_variable
+  weight_column: &weighting_column weighting_column
+
 tuning_params:
   tuning_func:
     object: pyspark.ml.tuning.CrossValidator
@@ -43,7 +47,7 @@ tuning_params:
       object: pyspark.ml.classification.RandomForestClassifier
       labelCol: *target_variable
       featuresCol: features
-      weightCol: *target_variable
+      weightCol: *weighting_column
     evaluator:
       object: pyspark.ml.evaluation.MulticlassClassificationEvaluator
       predictionCol: prediction
