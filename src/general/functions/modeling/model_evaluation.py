@@ -14,7 +14,7 @@ def prediction_evaluation(
 
     Args:
         data (DataFrame): Dataframe containing the true and predicted NUMERIC target
-        evaluation_function (Callable): Pypspark function to evaluate the data
+        evaluation_function (Callable): Pyspark function to evaluate the data
         evaluation_metrics (List[str]): Metric name which to use
 
     Returns:

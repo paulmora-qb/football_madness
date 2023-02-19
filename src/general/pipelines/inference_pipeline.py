@@ -3,7 +3,10 @@
 from kedro.pipeline import Pipeline, node
 
 from general.functions.preprocessing.filtering import filter_dataframe
-from general.functions.reporting.utils.prediction_sorting import create_standing_table
+from general.functions.reporting.utils.football_analysis import (
+    create_betting_analysis,
+    create_standing_table,
+)
 from general.nodes.modeling.model_inference import (
     model_prediction,
     target_column_inverter,
@@ -80,7 +83,8 @@ invert_categorical_target = Pipeline(
             outputs="inverted_model_predictions_inference",
             name="inverting_model_predictions_inference",
         ),
-    ]
+    ],
+    tags=["predictions", "inference"],
 )
 
 create_final_table = Pipeline(
@@ -94,6 +98,28 @@ create_final_table = Pipeline(
     ]
 )
 
+create_betting_winnings_analysis = Pipeline(
+    nodes=[
+        node(
+            func=create_betting_analysis,
+            inputs={
+                "prediction_data": "inverted_model_predictions_inference",
+                "match_data": "concatenated_raw_data",
+                "betting_analysis_provider": "params:betting_analysis_provider",
+            },
+            outputs="betting_analysis",
+            name="betting_winning_analysis",
+        ),
+        # node(
+        #     func=plot_lineplot,
+        #     inputs={
+        #         "data": "betting_analysis",
+        #     }
+        # )
+    ],
+    tags=["predictions", "inference"],
+)
+
 
 def create_pipeline(categorical_target: bool, create_standing_table: bool) -> Pipeline:
 
@@ -103,6 +129,6 @@ def create_pipeline(categorical_target: bool, create_standing_table: bool) -> Pi
         nodes += [invert_categorical_target]
 
     if create_standing_table:
-        nodes += [create_final_table]
+        nodes += [create_final_table, create_betting_winnings_analysis]
 
     return Pipeline(nodes, tags=["inference"])

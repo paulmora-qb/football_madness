@@ -1,11 +1,13 @@
 """Creating standing table"""
 
-from typing import Tuple
+from typing import Dict, Tuple
 
 import numpy as np
+import pandas as pd
 import scipy.stats as stats
 from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as f
+from pyspark.sql.functions import when
 from pyspark.sql.types import IntegerType
 
 from general.functions.feature_engineering.spine import create_team_spine
@@ -70,3 +72,72 @@ def create_standing_table(data: DataFrame) -> Tuple[DataFrame, float]:
     correlation, _ = stats.kendalltau(rank_array[:, 0], rank_array[:, 1])
 
     return agg_team_data, correlation
+
+
+def create_betting_analysis(
+    prediction_data: DataFrame, match_data: DataFrame, betting_analysis_provider: str,
+) -> pd.DataFrame:
+    """_summary_
+
+    Args:
+        prediction_data (DataFrame): _description_
+        match_data (DataFrame): _description_
+        betting_analysis_provider (str): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+
+    join_cols = ["home_team", "away_team", "date"]
+
+    data = (
+        prediction_data.select(
+            join_cols + ["tgt_full_time_result_pred", "tgt_full_time_result"]
+        )
+        .join(
+            match_data.select(
+                join_cols
+                + [
+                    x
+                    for x in match_data.columns
+                    if x.endswith("_odds") and x.startswith(betting_analysis_provider)
+                ]
+            ),
+            on=join_cols,
+            how="inner",
+        )
+        .withColumn("betting_input", f.lit(1))
+        .withColumn(
+            "relevant_odd",
+            (
+                when(
+                    f.col("tgt_full_time_result_pred") == "H",
+                    f.col(f"{betting_analysis_provider}_home_odds"),
+                )
+                .when(
+                    f.col("tgt_full_time_result_pred") == "A",
+                    f.col(f"{betting_analysis_provider}_away_odds"),
+                )
+                .otherwise(f.col(f"{betting_analysis_provider}_draw_odds"))
+            ),
+        )
+    )
+
+    betting_profit_data = (
+        data.withColumn(
+            "betting_profits",
+            f.when(
+                f.col("tgt_full_time_result_pred") == f.col("tgt_full_time_result"),
+                f.col("betting_input") * f.col("relevant_odd") - f.col("betting_input"),
+            ).otherwise(f.col("betting_input") * (-1)),
+        )
+        .select(["date", "betting_profits"])
+        .toPandas()
+        .sort_values("date")
+    )
+
+    betting_profit_data.loc[:, "cum_betting_profits"] = betting_profit_data.loc[
+        :, "betting_profits"
+    ].cumsum()
+
+    return betting_profit_data

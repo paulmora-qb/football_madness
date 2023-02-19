@@ -12,7 +12,7 @@ feature_importance_plot:
   xlabel: Feature Names
   ylabel: Normalized Feature Importance
   limit_bars: 20
-  rotation: 45
+  rotation: 90
 
 confusion_matrix_preparation:
   prediction_column_name: tgt_full_time_result_pred

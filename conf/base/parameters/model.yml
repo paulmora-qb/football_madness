@@ -1,6 +1,4 @@
-reference_season: # Placeholder
-reference_team: # Placeholder
-reference_league: # Placeholder
+# Modeling
 
 target_variable:
   target_column_name: full_time_result
@@ -77,3 +75,11 @@ performance_evaluation_params:
     - weightedPrecision
     - weightedRecall
     - accuracy
+
+# Inference
+
+reference_season: # Placeholder
+reference_team: # Placeholder
+reference_league: # Placeholder
+
+betting_analysis_provider: bet365
