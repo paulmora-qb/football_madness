@@ -1,3 +1,5 @@
+_pandas: &pandas
+  type: pandas.CSVDataSet
 
 _plt: &plt
   type: matplotlib.MatplotlibWriter
@@ -16,3 +18,11 @@ feature_importance_plot:
 confusion_matrix_heatmap_plot:
   <<: *plt
   filepath: ./data/08_reporting/confusion_matrix_plot.png
+
+betting_analysis:
+  <<: *pandas
+  filepath: ./data/07_model_output/betting_analysis
+
+betting_analysis_lineplot:
+  <<: *plt
+  filepath: ./data/08_reporting/betting_analysis_lineplot.png

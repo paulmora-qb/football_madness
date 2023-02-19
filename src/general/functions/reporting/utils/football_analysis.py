@@ -5,10 +5,10 @@ from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
+from pyspark.ml.functions import vector_to_array
 from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as f
 from pyspark.sql.functions import when
-from pyspark.sql.types import IntegerType
 
 from general.functions.feature_engineering.spine import create_team_spine
 
@@ -75,69 +75,83 @@ def create_standing_table(data: DataFrame) -> Tuple[DataFrame, float]:
 
 
 def create_betting_analysis(
-    prediction_data: DataFrame, match_data: DataFrame, betting_analysis_provider: str,
+    prediction_data: DataFrame,
+    match_data: DataFrame,
+    betting_profit_params: Dict[str, str],
 ) -> pd.DataFrame:
-    """_summary_
+    """This function creates an overview of how much profit the machine learning
+    algorithm would be creating when being used. This is done in the following way:
+
+    1. Select the relevant broker to get the quotas
+    2. Calculate the profits for the case the model is right and the model is wrong
+    3. Differentiate the result by the number of model certainty
 
     Args:
-        prediction_data (DataFrame): _description_
-        match_data (DataFrame): _description_
-        betting_analysis_provider (str): _description_
+        prediction_data (DataFrame): Dataframe containing the information of the
+            prediction, and the prediction probability
+        match_data (DataFrame): Dataframe containing the information which teams played
+            and what the quotas are of the game
+        betting_profit_params (List[str]): Parameter containing the information
+            which broker to use and which probabilities are used to differentiate the
+            model
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: Dataframe containing the profit, probability and the number
+            of games within each bracket
     """
 
+    broker = betting_profit_params["broker"]
+    probabilities = betting_profit_params["probabilities"]
+
     join_cols = ["home_team", "away_team", "date"]
+    betting_cols = [x for x in match_data.columns if (x.split("_")[0] in broker)]
 
     data = (
         prediction_data.select(
-            join_cols + ["tgt_full_time_result_pred", "tgt_full_time_result"]
+            join_cols
+            + ["tgt_full_time_result_pred", "tgt_full_time_result", "probability"]
         )
-        .join(
-            match_data.select(
-                join_cols
-                + [
-                    x
-                    for x in match_data.columns
-                    if x.endswith("_odds") and x.startswith(betting_analysis_provider)
-                ]
-            ),
-            on=join_cols,
-            how="inner",
-        )
+        .join(match_data.select(join_cols + betting_cols), on=join_cols, how="inner",)
         .withColumn("betting_input", f.lit(1))
-        .withColumn(
-            "relevant_odd",
-            (
-                when(
-                    f.col("tgt_full_time_result_pred") == "H",
-                    f.col(f"{betting_analysis_provider}_home_odds"),
-                )
-                .when(
-                    f.col("tgt_full_time_result_pred") == "A",
-                    f.col(f"{betting_analysis_provider}_away_odds"),
-                )
-                .otherwise(f.col(f"{betting_analysis_provider}_draw_odds"))
-            ),
-        )
+        .withColumn("probability", f.array_max(vector_to_array(f.col("probability"))))
     )
 
-    betting_profit_data = (
-        data.withColumn(
-            "betting_profits",
-            f.when(
-                f.col("tgt_full_time_result_pred") == f.col("tgt_full_time_result"),
-                f.col("betting_input") * f.col("relevant_odd") - f.col("betting_input"),
-            ).otherwise(f.col("betting_input") * (-1)),
-        )
-        .select(["date", "betting_profits"])
-        .toPandas()
-        .sort_values("date")
+    betting_profit_data = pd.DataFrame(
+        columns=["total_profit", "number_observations", "probability_threshold"]
     )
+    for probability in probabilities:
 
-    betting_profit_data.loc[:, "cum_betting_profits"] = betting_profit_data.loc[
-        :, "betting_profits"
-    ].cumsum()
+        tmp_betting_profit_data = (
+            data.withColumn(
+                "relevant_odd",
+                (
+                    when(
+                        f.col("tgt_full_time_result_pred") == "H",
+                        f.col(f"{broker}_home_odds"),
+                    )
+                    .when(
+                        f.col("tgt_full_time_result_pred") == "A",
+                        f.col(f"{broker}_away_odds"),
+                    )
+                    .otherwise(f.col(f"{broker}_draw_odds"))
+                ),
+            )
+            .withColumn(
+                "betting_profits",
+                f.when(
+                    f.col("tgt_full_time_result_pred") == f.col("tgt_full_time_result"),
+                    f.col("betting_input") * f.col("relevant_odd")
+                    - f.col("betting_input"),
+                ).otherwise(f.col("betting_input") * (-1)),
+            )
+            .filter(f.col("probability") > probability)
+            .select(
+                f.sum("betting_profits").alias("total_profit"),
+                f.sum("betting_input").alias("number_observations"),
+            )
+            .withColumn("probability_threshold", f.lit(probability))
+            .toPandas()
+        )
+        betting_profit_data = betting_profit_data.append(tmp_betting_profit_data)
 
     return betting_profit_data

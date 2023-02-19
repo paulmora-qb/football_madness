@@ -82,4 +82,10 @@ reference_season: # Placeholder
 reference_team: # Placeholder
 reference_league: # Placeholder
 
-betting_analysis_provider: bet365
+betting_profit_params:
+  broker: bet365
+  probabilities:
+    - 0.8
+    - 0.6
+    - 0.4
+    - 0.2

@@ -95,7 +95,8 @@ create_final_table = Pipeline(
             outputs=["standing_table_inference", "kendall_tau"],
             name="standing_table_inference",
         )
-    ]
+    ],
+    tags=["predictions", "inference", "analysis"],
 )
 
 create_betting_winnings_analysis = Pipeline(
@@ -105,30 +106,24 @@ create_betting_winnings_analysis = Pipeline(
             inputs={
                 "prediction_data": "inverted_model_predictions_inference",
                 "match_data": "concatenated_raw_data",
-                "betting_analysis_provider": "params:betting_analysis_provider",
+                "betting_profit_params": "params:betting_profit_params",
             },
             outputs="betting_analysis",
             name="betting_winning_analysis",
         ),
-        # node(
-        #     func=plot_lineplot,
-        #     inputs={
-        #         "data": "betting_analysis",
-        #     }
-        # )
     ],
-    tags=["predictions", "inference"],
+    tags=["post_eda", "betting_analysis", "analysis"],
 )
 
 
-def create_pipeline(categorical_target: bool, create_standing_table: bool) -> Pipeline:
+def create_pipeline(categorical_target: bool, inference_analysis: bool) -> Pipeline:
 
     nodes = [filter_dataframe_node, apply_imputer, make_model_predictions]
 
     if categorical_target:
         nodes += [invert_categorical_target]
 
-    if create_standing_table:
+    if inference_analysis:
         nodes += [create_final_table, create_betting_winnings_analysis]
 
     return Pipeline(nodes, tags=["inference"])
