@@ -85,6 +85,12 @@ feature:
           - betting_odds_losing
           - full_time_goals
           - full_time_opponent_goals
+          - shots_target
+          - opponent_shots_target
+          - corners
+          - opponent_corners
+          - fouls
+          - opponent_fouls
           - points_per_game
           - winning_the_game
           - drawing_the_game
@@ -92,6 +98,17 @@ feature:
           - game_indication
         aggregation_type: pyspark.sql.functions.avg
         rows_between: [[-30, -1], [-5, -1]]
+        prefix: ftr_window_team
+        suffix: last_games
+      - object: general.functions.feature_engineering.aggregation.create_window_aggregates
+        partition_by: ["team"]
+        order_by: ["datediff"]
+        aggregation_columns:
+          - betting_odds_winning
+          - betting_odds_drawing
+          - betting_odds_losing
+        aggregation_type: pyspark.sql.functions.avg
+        rows_between: [[0, 0]]
         prefix: ftr_window_team
         suffix: last_games
       - object: general.functions.feature_engineering.aggregation.create_window_aggregates
