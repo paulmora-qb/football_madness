@@ -3,9 +3,18 @@
 import datetime
 from typing import Dict
 
+import pandas as pd
 import pytest
 import yaml
 from pyspark.sql import DataFrame, Row
+from pyspark.sql.types import (
+    DateType,
+    FloatType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
 
 
 @pytest.fixture(scope="function")
@@ -41,14 +50,14 @@ def momentum_params() -> Dict[str, str]:
           - winning_the_game
           - total_shots
           - game_indication
-        aggregation_type: pyspark.sql.functions.avg
+        aggregation_type: pyspark.sql.functions.sum
         rows_between: [[-1, 0]]
         prefix: ftr
         suffix: last
     post_window_operations:
       - object: general.functions.feature_engineering.aggregation.dynamic_post_window_aggregation
-        left_column: tmp_general_winning_the_game_(?P<window>.*)_last_games
-        right_column: tmp_general_game_indication_(?P<window>.*)_last_games
+        left_column: ftr_winning_the_game_(?P<window>.*)_last
+        right_column: ftr_game_indication_(?P<window>.*)_last
         math_operation: /
         output_column: ftr_ratio_winning_past_game_{window}
     """
@@ -58,24 +67,34 @@ def momentum_params() -> Dict[str, str]:
 @pytest.fixture(scope="function")
 def momentum_expected(spark) -> DataFrame:
     return spark.createDataFrame(
-        [
-            Row(
-                team="rick",
-                date=datetime.date(2020, 10, 5),
-                league="funny_league",
-                home_away_indication="away",
-                ftr_winning_the_game_row_1_row_0_last=0.0,
-                ftr_total_shots_row_1_row_0_last=25.0,
-                ftr_game_indication_row_1_row_0_last=1.0,
-            ),
-            Row(
-                team="rick",
-                date=datetime.date(2020, 10, 10),
-                league="funny_league",
-                home_away_indication="home",
-                ftr_winning_the_game_row_1_row_0_last=0.5,
-                ftr_total_shots_row_1_row_0_last=20.0,
-                ftr_game_indication_row_1_row_0_last=1.0,
-            ),
-        ]
+        pd.DataFrame(
+            {
+                "team": {0: "rick", 1: "rick"},
+                "date": {0: datetime.date(2020, 10, 5), 1: datetime.date(2020, 10, 10)},
+                "league": {0: "funny_league", 1: "funny_league"},
+                "home_away_indication": {0: "away", 1: "home"},
+                "ftr_winning_the_game_row_1_row_0_last": {0: 0, 1: 1},
+                "ftr_total_shots_row_1_row_0_last": {0: 20.0, 1: 40.0},
+                "ftr_game_indication_row_1_row_0_last": {0: 1, 1: 2},
+                "ftr_ratio_winning_past_game_row_1_row_0": {0: 0.0, 1: 0.5},
+            }
+        ),
+        schema=StructType(
+            [
+                StructField("team", StringType(), True),
+                StructField("date", DateType(), True),
+                StructField("league", StringType(), True),
+                StructField("home_away_indication", StringType(), True),
+                StructField(
+                    "ftr_winning_the_game_row_1_row_0_last", IntegerType(), True
+                ),
+                StructField("ftr_total_shots_row_1_row_0_last", FloatType(), True),
+                StructField(
+                    "ftr_game_indication_row_1_row_0_last", IntegerType(), True
+                ),
+                StructField(
+                    "ftr_ratio_winning_past_game_row_1_row_0", FloatType(), True
+                ),
+            ]
+        ),
     )

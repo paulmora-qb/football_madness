@@ -19,15 +19,15 @@ from general.nodes.preprocessing.transformer import fit, transform
 from utilities.helper import update_dictionary
 
 
-def create_pipeline(categorical_target: str) -> Pipeline:
-    """_summary_
+def create_pipeline(categorical_target: bool) -> Pipeline:
+    """Supervised pipeline
 
     Args:
-        model_type (_type_): _description_
-        categorical_target (_type_): _description_
+        categorical_target (bool): Indication whether the data science problem deals
+            with a classification case. If false a regression case is assumed.
 
     Returns:
-        Pipeline: _description_
+        Pipeline: Supervised learning pipeline
     """
 
     data_dictionary = Pipeline(

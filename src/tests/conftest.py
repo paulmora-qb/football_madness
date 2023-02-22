@@ -3,8 +3,10 @@
 import datetime
 from functools import partial
 
+import pandas as pd
 import pytest
 from pyspark.sql import DataFrame, Row, SparkSession
+from pyspark.sql.types import DateType, FloatType, StringType, StructField, StructType
 
 
 class Helpers:
@@ -51,27 +53,29 @@ def spark() -> SparkSession:
 @pytest.fixture(scope="session")
 def team_spine(spark) -> DataFrame:
     return spark.createDataFrame(
-        [
-            Row(
-                team="rick",
-                opponent_team="morty",
-                league="funny_league",
-                full_time_result="win",
-                shots_left=10,
-                shots_right=20,
-                home_away_indication="home",
-                date=datetime.date(2020, 10, 10),
-            ),
-            Row(
-                team="rick",
-                opponent_team="morty",
-                league="funny_league",
-                full_time_result="loss",
-                shots_left=20,
-                shots_right=30,
-                home_away_indication="away",
-                date=datetime.date(2020, 10, 5),
-            ),
-        ]
+        pd.DataFrame(
+            {
+                "team": {0: "rick", 1: "rick"},
+                "opponent_team": {0: "morty", 1: "morty"},
+                "league": {0: "funny_league", 1: "funny_league"},
+                "full_time_result": {0: "win", 1: "loss"},
+                "shots_left": {0: None, 1: 20},
+                "shots_right": {0: 20.0, 1: None},
+                "home_away_indication": {0: "home", 1: "away"},
+                "date": {0: datetime.date(2020, 10, 10), 1: datetime.date(2020, 10, 5)},
+            }
+        ),
+        schema=StructType(
+            [
+                StructField("team", StringType(), True),
+                StructField("opponent_team", StringType(), True),
+                StructField("league", StringType(), True),
+                StructField("full_time_result", StringType(), True),
+                StructField("shots_left", FloatType(), True),
+                StructField("shots_right", FloatType(), True),
+                StructField("home_away_indication", StringType(), True),
+                StructField("date", DateType(), True),
+            ]
+        ),
     )
 
