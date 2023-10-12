@@ -1,4 +1,19 @@
-spark.appName: Test
-spark.executor.memory: 12g
-spark.executor.cores: 2
-spark.driver.memory: 3g
+# Name of application
+spark.appName: football_madness
+# Generally recommended value
+spark.executor.cores: 5
+# Number of executors per instance = (total number of virtual cores per instance - 1)/ spark.executors.cores
+# Total executor memory = total RAM per instance / number of executors per instance
+spark.executor.memory: 21g
+# spark.yarn.executor.memoryOverhead = total executor memory * 0.10
+spark.executor.memoryOverhead: 2g
+#spark.driver.memory = spark.executors.memory
+spark.driver.memory: 10g
+# spark.driver.cores= spark.executors.cores.
+spark.driver.cores: 5
+# spark.executor.instances = (number of executors per instance * number of core instances) minus 1 for the driver
+spark.executor.instances: 7
+# spark.default.parallelism = spark.executor.instances * spark.executors.cores * 2
+spark.default.parallelism: 70
+# Removes the maximum size in bytes for a table that will be broadcasted
+spark.sql.autoBroadcastJoinThreshold: -1

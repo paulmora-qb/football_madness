@@ -35,7 +35,10 @@ apply_imputer = Pipeline(
     nodes=[
         node(
             func=transform,
-            inputs={"data": "master_table_inference", "transformer": "fitted_imputer",},
+            inputs={
+                "data": "master_table_inference",
+                "transformer": "fitted_imputer",
+            },
             outputs="imputed_dataset_inference",
             name="imputing_dataset_inference",
             tags=["imputation", "inference"],
@@ -91,7 +94,10 @@ create_final_table = Pipeline(
     nodes=[
         node(
             func=create_standing_table,
-            inputs={"data": "inverted_model_predictions_inference"},
+            inputs={
+                "data": "inverted_model_predictions_inference",
+                "reference_league": "params:reference_league",
+            },
             outputs=["standing_table_inference", "kendall_tau"],
             name="standing_table_inference",
         )
@@ -112,12 +118,11 @@ create_betting_winnings_analysis = Pipeline(
             name="betting_winning_analysis",
         ),
     ],
-    tags=["post_eda", "betting_analysis", "analysis"],
+    tags=["post_eda", "betting_analysis", "analysis", "inference"],
 )
 
 
 def create_pipeline(categorical_target: bool, inference_analysis: bool) -> Pipeline:
-
     nodes = [filter_dataframe_node, apply_imputer, make_model_predictions]
 
     if categorical_target:

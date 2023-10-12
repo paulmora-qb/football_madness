@@ -9,11 +9,14 @@ from pyspark.ml.functions import vector_to_array
 from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as f
 from pyspark.sql.functions import when
+from pyspark.sql.types import IntegerType
 
 from general.functions.feature_engineering.spine import create_team_spine
 
 
-def create_standing_table(data: DataFrame) -> Tuple[DataFrame, float]:
+def create_standing_table(
+    data: DataFrame, reference_league: str
+) -> Tuple[DataFrame, float]:
     """This function takes the predictions and true values for a certain season/time
     / league and
 
@@ -27,7 +30,9 @@ def create_standing_table(data: DataFrame) -> Tuple[DataFrame, float]:
     Args:
         data (DataFrame): Dataframe containing the true and predicted outcome of the
             game in the match spine format, meaning with having a home and away
-            team
+            team.
+        reference_league (str): Name of the league for the standing table. Used mainly
+            for parititioning of the spark dataframe.
 
     Returns:
         Tuple[DataFrame, float]: Two things are returned, for once the dataframe
@@ -46,7 +51,7 @@ def create_standing_table(data: DataFrame) -> Tuple[DataFrame, float]:
 
     team_data = create_team_spine(
         match_data=data.select(
-            ["home_team", "away_team", "date",] + true_and_pred_columns
+            ["home_team", "away_team", "date", "league"] + true_and_pred_columns
         ),
         target_column=true_and_pred_columns,
     )
@@ -67,6 +72,7 @@ def create_standing_table(data: DataFrame) -> Tuple[DataFrame, float]:
         agg_team_data = agg_team_data.withColumn(
             rank_col_name, f.dense_rank().over(Window.orderBy(f.desc(col)))
         )
+    agg_team_data = agg_team_data.withColumn("league", f.lit(reference_league))
 
     rank_array = np.array(agg_team_data.select(rank_col_names).collect())
     correlation, _ = stats.kendalltau(rank_array[:, 0], rank_array[:, 1])
@@ -109,9 +115,18 @@ def create_betting_analysis(
     data = (
         prediction_data.select(
             join_cols
-            + ["tgt_full_time_result_pred", "tgt_full_time_result", "probability"]
+            + [
+                "tgt_full_time_result_pred",
+                "tgt_full_time_result",
+                "probability",
+                "league",
+            ]
         )
-        .join(match_data.select(join_cols + betting_cols), on=join_cols, how="inner",)
+        .join(
+            match_data.select(join_cols + betting_cols),
+            on=join_cols,
+            how="inner",
+        )
         .withColumn("betting_input", f.lit(1))
         .withColumn("probability", f.array_max(vector_to_array(f.col("probability"))))
     )
@@ -120,7 +135,6 @@ def create_betting_analysis(
         columns=["total_profit", "number_observations", "probability_threshold"]
     )
     for probability in probabilities:
-
         tmp_betting_profit_data = (
             data.withColumn(
                 "relevant_odd",
@@ -145,6 +159,11 @@ def create_betting_analysis(
                 ).otherwise(f.col("betting_input") * (-1)),
             )
             .filter(f.col("probability") > probability)
+            .groupby("league")
+            .agg(
+                f.sum("betting_profits").alias("total_profit"),
+                f.sum("betting_input").alias("number_observations"),
+            )
             .select(
                 f.sum("betting_profits").alias("total_profit"),
                 f.sum("betting_input").alias("number_observations"),

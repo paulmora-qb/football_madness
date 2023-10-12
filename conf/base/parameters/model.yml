@@ -39,8 +39,8 @@ tuning_params:
   tuning_func:
     object: pyspark.ml.tuning.CrossValidator
     seed: 42
-    parallelism: 6
-    numFolds: 3
+    parallelism: 8 # equal to the number of CPUs
+    numFolds: 2
     estimator:
       object: pyspark.ml.classification.RandomForestClassifier
       labelCol: *target_variable
@@ -84,8 +84,4 @@ reference_league: # Placeholder
 
 betting_profit_params:
   broker: bet365
-  probabilities:
-    - 0.8
-    - 0.6
-    - 0.4
-    - 0.2
+  probabilities: [0.5, 0.4, 0.3, 0.2, 0.1]
